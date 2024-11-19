@@ -1,0 +1,78 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyCharm specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+*.temp
+*.log
+*.bak
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# TensorFlow and PyTorch checkpoints
+checkpoint
+checkpoints/
+*.ckpt
+*.h5
+*.pth
+*.pt
+logs/
+
+# Model files
+*.model
+*.weights
+*.onnx
+*.tflite
+
+# Large datasets or images
+datasets/
+data/
+*.csv
+*.tsv
+*.json
+*.pickle
+*.joblib
+*.dat
+
+# Results and output files
+output/
+results/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.avi
+*.mov
+
+# Config files
+*.cfg
+*.yaml
+*.yml
+
+# Build files
+build/
+dist/
+*.egg-info/
