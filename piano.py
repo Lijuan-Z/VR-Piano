@@ -172,6 +172,7 @@ def finger_to_keys_distance(img, finger_position_arr):
 piano_bar_info = (9999, '') # initialize, info for calling piano_bar function
 while True:
     success, img = cap.read() # initialize cv
+    img = cv2.flip(img, 1) # mirror the image so that it is normal facing
     img = detector.findHands(img) # self create drawing hands class
     lmList = detector.findPosition(img, draw=False)
 
