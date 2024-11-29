@@ -52,15 +52,18 @@ BAR_DOWN_RANGE = (15, 70)
 
 PIANO_BAR_COLOR = (0, 255, 0)
 PIANO_BARS_CENTER_POS = (325, 425)
-PIANO_BAR_A_CENTER = (PIANO_BARS_CENTER_POS[0] - 200, PIANO_BARS_CENTER_POS[1], 'A')
-PIANO_BAR_B_CENTER = (PIANO_BARS_CENTER_POS[0] - 100, PIANO_BARS_CENTER_POS[1], 'B')
+BAR_SIZE_FROM_CENTER = 20       # KEY FACTOR TO CONTROL THE SIZE OF PIANO BARS AND ALSO THE AREA OF TOUCH
+PIANO_BAR_A_CENTER = (PIANO_BARS_CENTER_POS[0] - 4* BAR_SIZE_FROM_CENTER, PIANO_BARS_CENTER_POS[1], 'A')
+PIANO_BAR_B_CENTER = (PIANO_BARS_CENTER_POS[0] - 2* BAR_SIZE_FROM_CENTER, PIANO_BARS_CENTER_POS[1], 'B')
 PIANO_BAR_C_CENTER = (PIANO_BARS_CENTER_POS[0] + 0, PIANO_BARS_CENTER_POS[1], 'C')
-PIANO_BAR_D_CENTER = (PIANO_BARS_CENTER_POS[0] + 100, PIANO_BARS_CENTER_POS[1], 'D')
-PIANO_BAR_E_CENTER = (PIANO_BARS_CENTER_POS[0] + 200, PIANO_BARS_CENTER_POS[1], 'E')
+PIANO_BAR_D_CENTER = (PIANO_BARS_CENTER_POS[0] + 2* BAR_SIZE_FROM_CENTER, PIANO_BARS_CENTER_POS[1], 'D')
+PIANO_BAR_E_CENTER = (PIANO_BARS_CENTER_POS[0] + 4* BAR_SIZE_FROM_CENTER, PIANO_BARS_CENTER_POS[1], 'E')
 
 PIANO_BARS = [PIANO_BAR_A_CENTER, PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER]
-FINGERTIPS = [8] # currently too sensitive
+FINGERTIPS = [8] # currently one finger
 # FINGERTIPS = [4, 8, 12, 16, 20]
+
+THROTTLE_THRESHOLD = 100     # if a finger stay at the same bar. This control how many conservative bars to wait before we allow another sound playing
 
 cap = cv2.VideoCapture(CVID)
 cap.set(3, wCam)
@@ -68,31 +71,34 @@ cap.set(4, hCam)
 
 detector = htm.handDetector(min_detection_confidence=0.8)
 
-bar_label = ''
+
+bar_label = ''      # a global variable to know which piano bar it is touching
+trottle_control = []    # a global variable to store conservative bars. It use to prevent keep firing the same key when a finger stay in touching position
+
 
 def get_positions_by_bar_name(bar):
     match bar:
         case 'A':
-            return (PIANO_BAR_A_CENTER[0] - 50, PIANO_BAR_A_CENTER[1] - 50, PIANO_BAR_A_CENTER[0] + 50, PIANO_BAR_A_CENTER[1] + 50)
+            return (PIANO_BAR_A_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] + BAR_SIZE_FROM_CENTER)
         case 'B':
-            return (PIANO_BAR_B_CENTER[0] - 50, PIANO_BAR_B_CENTER[1] - 50, PIANO_BAR_B_CENTER[0] + 50, PIANO_BAR_B_CENTER[1] + 50)
+            return (PIANO_BAR_B_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] + BAR_SIZE_FROM_CENTER)
         case 'C':
-            return (PIANO_BAR_C_CENTER[0] - 50, PIANO_BAR_C_CENTER[1] - 50, PIANO_BAR_C_CENTER[0] + 50,PIANO_BAR_C_CENTER[1] + 50)
+            return (PIANO_BAR_C_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[0] + BAR_SIZE_FROM_CENTER,PIANO_BAR_C_CENTER[1] + BAR_SIZE_FROM_CENTER)
         case 'D':
-            return (PIANO_BAR_D_CENTER[0] - 50, PIANO_BAR_D_CENTER[1] - 50, PIANO_BAR_D_CENTER[0] + 50,PIANO_BAR_D_CENTER[1] + 50)
+            return (PIANO_BAR_D_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[0] + BAR_SIZE_FROM_CENTER,PIANO_BAR_D_CENTER[1] + BAR_SIZE_FROM_CENTER)
         case 'E':
-            return (PIANO_BAR_E_CENTER[0] - 50, PIANO_BAR_E_CENTER[1] - 50, PIANO_BAR_E_CENTER[0] + 50,PIANO_BAR_E_CENTER[1] + 50)
+            return (PIANO_BAR_E_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[0] + BAR_SIZE_FROM_CENTER,PIANO_BAR_E_CENTER[1] + BAR_SIZE_FROM_CENTER)
 
 
 def piano_bar(img, bar, pos, bar_label):
     # Drawing current piano bar with real-time status
-    print(bar, bar_label)
+    # print(bar, bar_label)
     x1, y1, x2, y2 = get_positions_by_bar_name(bar)
 
     if bar == bar_label:
         # bar down
         pos = np.interp(pos, [BAR_DOWN_RANGE[0], BAR_DOWN_RANGE[1]], [y2, y1])
-        print(int(pos))
+        # print(int(pos))
 
         cv2.line(img, (x1, int(pos)), (x2, int(pos)), PIANO_BAR_COLOR, 3)  # top, both p1, p2 y move
         cv2.line(img, (x1, y1), (x1, int(pos)), PIANO_BAR_COLOR, 3)  # left,  y2 move
@@ -108,6 +114,28 @@ def piano_bar(img, bar, pos, bar_label):
         cv2.line(img, (x2, y1), (x2, y2), PIANO_BAR_COLOR, 3)  # right, y2 move
         cv2.line(img, (x1, y2), (x2, y2), PIANO_BAR_COLOR, 3)  # bottom, never move
 
+def throttle_controller(bar):
+    # True: wait enough time, allow to play the sound
+    # False: not enough waiting, don't allow any sound play
+    global trottle_control
+
+    if len(trottle_control) == 0:
+        # the first bar, always allow to play conservatively
+        trottle_control.append(bar)
+        return True
+    elif len(trottle_control) < THROTTLE_THRESHOLD:
+        if trottle_control[-1] == bar:
+            # only add bar if the current bar is the same as last bar
+            trottle_control.append(bar)
+            return False
+        else:
+            # otherwise it is another bar and we should allow and clear the list
+            trottle_control = []
+            return True
+    else:
+        # The bar is already pass threshold, allow to play
+        trottle_control = []
+        return True
 
 def finger_to_keys_distance(img, finger_position_arr):
     # 1. determine the closes key by x first, then y
@@ -153,14 +181,23 @@ while True:
             x2, y2 = lmList[finger][1], lmList[finger][2]
             cv2.circle(img, (x2, y2), FINGER_DOT_SIZE, (125, 125, 0), FINGER_DOT_SHAPE)
 
-            dist, bar_label = finger_to_keys_distance(img, [x2, y2])
+            dist, bar_label = finger_to_keys_distance(img, [x2, y2]) # return the distance and draw the line if distance is short enough
+
+            print(f"pause on conservative key: {len(trottle_control)} [0 - ${THROTTLE_THRESHOLD}]")
+            if bar_label == "":
+                # finger is not on a bar or left the bar, clear the trottle control:
+                trottle_control = []
 
             if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
                 # consider touching
                 print(f"finger {finger} is touched bar {bar_label} with distance: {dist}")
-                soundPool.submit(play_sound, bar_label)
+
+                # check if it is a conservative keys. Not playing sound if the finger is just keep staying
+
+                if throttle_controller(bar_label):
+                    soundPool.submit(play_sound, bar_label)
                 piano_bar_info = (dist, bar_label)
-                touch = True
+
 
     for bar in PIANO_BARS:
         piano_bar(img, bar[2], int(piano_bar_info[0]), bar_label)
