@@ -15,9 +15,11 @@ def play_sound(key):
         case 'B':
             playsound("./sound/B_major.wav")
         case 'C':
-            playsound("./sound/C_major.wav")
+            playsound("./sound/C_major.mp3")
+            # playsound("./sound/C_major.wav")
         case 'D':
-            playsound("./sound/D_major.wav")
+            playsound("./sound/D_major.mp3")
+            # playsound("./sound/D_major.wav")
         case 'E':
             playsound("./sound/D_major.wav")
 
@@ -33,8 +35,8 @@ FPS_FONT_SCALE, FPS_FONT_THINKNESS = 1, 2
 FPS_FONT_COLOR = (255, 0, 0)
 
 # Finger drawing
-FINGER_DOT_SIZE = 10
-FINGER_DOT_COLOR = (255, 0, 255)
+FINGER_DOT_SIZE = 7
+FINGER_DOT_COLOR = (75, 75, 75)
 FINGER_DOT_SHAPE = cv2.FILLED
 LINE_FROM_FINGER_COLOR = (0, 255, 255)
 LINE_FROM_FINGER_THICKNESS = 2
@@ -45,10 +47,10 @@ BAR_SIZE_FROM_CENTER = 20       # KEY FACTOR TO CONTROL THE SIZE OF PIANO BARS
 # Touching point (hand)
 TOUCHING_POINT_COLOR = (255, 255, 255)
 TOUCHING_POINT_SHAPE = cv2.FILLED
-TOUCHING_POINT_SIZE = 15
+TOUCHING_POINT_SIZE = 7
 
 # Touching point (piano bar)
-TOUCHING_ZONE_FROM_PIANO_BAR_CENTER = BAR_SIZE_FROM_CENTER + 15  # KEY FACTOR TO DEFINE THE STARTING POINT OF TOUCH IN Y-AXIS
+TOUCHING_ZONE_FROM_PIANO_BAR_CENTER = BAR_SIZE_FROM_CENTER  # KEY FACTOR TO DEFINE THE STARTING POINT OF TOUCH IN Y-AXIS
 READY_ZONE = 80
 BAR_DOWN_RANGE = (15, TOUCHING_ZONE_FROM_PIANO_BAR_CENTER)
 TOUCHING_ZONE_COLOR = (0, 0, 255)
@@ -63,8 +65,8 @@ PIANO_BAR_D_CENTER = (PIANO_BARS_CENTER_POS[0] + 2* BAR_SIZE_FROM_CENTER, PIANO_
 PIANO_BAR_E_CENTER = (PIANO_BARS_CENTER_POS[0] + 4* BAR_SIZE_FROM_CENTER, PIANO_BARS_CENTER_POS[1], 'E')
 
 PIANO_BARS = [PIANO_BAR_A_CENTER, PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER]
-FINGERTIPS = [8, 12] # currently one finger
-# FINGERTIPS = [4, 8, 12, 16, 20]
+# FINGERTIPS = [8, 12] # currently one finger
+FINGERTIPS = [4, 8, 12, 16, 20]
 NUMBER_OF_HANDS = 0 # one or two hands
 
 THROTTLE_THRESHOLD = 100     # if a finger stay at the same bar. This control how many conservative bars to wait before we allow another sound playing
@@ -141,8 +143,10 @@ def finger_to_keys_distance(img, finger_position_arr):
     for bar in PIANO_BARS:
         LEFT_TOUCHING_MARGIN = bar[0] - BAR_SIZE_FROM_CENTER + TOUCHING_ZONE_WIDTH_DEDUCTION
         RIGHT_TOUCHING_MARGIN = bar[0] + BAR_SIZE_FROM_CENTER - TOUCHING_ZONE_WIDTH_DEDUCTION
-        # Staring by consider only finger position within the range of current bar. The total width of the bar
+        print(f"looping to {bar[2]}")
+        # Staring by consider only finger position within the range of current bar, and restricted margin
         if finger_position_arr[0] > LEFT_TOUCHING_MARGIN and finger_position_arr[0] < RIGHT_TOUCHING_MARGIN:
+            print(f"in range {bar[2]}")
             # print(f"{bar[2]} is testing range {LEFT_TOUCHING_MARGIN} > {finger_position_arr[0]} < {RIGHT_TOUCHING_MARGIN}")
             if SHOW_FINGERTIP_DOTS_AND_LINES:
                 # visualize the area of touch
@@ -154,7 +158,7 @@ def finger_to_keys_distance(img, finger_position_arr):
             distance = math.hypot(finger_position_arr[0] - bar[0], finger_position_arr[1] - bar[1])
             # print(f"in key {bar[2]}, {distance}")
             if distance <= READY_ZONE:
-                # print(f"READY_ZONE {bar[2]}, {distance}")
+                print(f"READY_ZONE {bar[2]}, {distance}")
 
                 if SHOW_FINGERTIP_DOTS_AND_LINES:
                     # draw on finger
@@ -183,11 +187,12 @@ def main():
     detector = htm.handDetector(min_detection_confidence=0.8)
     bar_label = ""  # a global variable to know which piano bar it is touching
     trottle_control = {i: [] for i in FINGERTIPS}  # a global variable to store conservative bars, for each finger. It use to prevent keep firing the same key when a finger stay in touching position
+    isBarEnabled = {j[2]: True for j in PIANO_BARS} # a variable to store the whether a bar is enabled or disabled, prevent multiple fingers pressing the same bar and play sound
 
     pressed_bar_distance_info = dict() # initialize, info for calling piano_bar function
 
     while True:
-        # time.sleep(0.1)
+        time.sleep(0.1)
         success, img = cap.read() # initialize cv
         img = cv2.flip(img, 1) # mirror the image so that it is normal facing
         img = detector.findHands(img) # self create drawing hands class
@@ -202,20 +207,46 @@ def main():
 
                 dist, bar_label = finger_to_keys_distance(img, [x2, y2]) # return the distance and draw the line if distance is short enough
 
-                if bar_label == "":
-                    # finger is not on a bar or left the bar, clear the trottle control:
-                    trottle_control = {i: [] for i in FINGERTIPS}
-                    pressed_bar_distance_info = dict()
+                print(finger, isBarEnabled, trottle_control)
+                show_trottle = dict()
+                for k, v in trottle_control.items():
+                    if len(v) == 0:
+                        show_trottle[k]: "0"
+                    else:
+                        show_trottle[k]: f"{v} - {len(v)}"
+                cv2.putText(img, f'isBarEnaabled: {isBarEnabled}', (200, FPS_Y_LOCATION), FPS_FONT, 0.4,(150,150,150), 1)
+                cv2.putText(img, f'Trottle: {show_trottle}', (200, FPS_Y_LOCATION + 20),FPS_FONT, 0.4, (150, 150, 150), 1)
 
+                # if bar_label == "":
+
+                #     pressed_bar_distance_info[bar_label] = ""
+
+                # Current finger Entering a bar
                 if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
                     # consider touching
-                    print(f"finger {finger} is touched a bar {bar_label} with distance: {dist}")
+                    # print(f"finger {finger} is touched a bar {bar_label} with distance: {dist}")
+
+
 
                     # check if it is a conservative keys. Not playing sound if the finger is keep staying
-                    if throttle_controller(trottle_control, finger, bar_label):
+                    throttle_controller(trottle_control, finger, bar_label)
+                    if isBarEnabled[bar_label]:
+                    # if throttle_controller(trottle_control, finger, bar_label) and isBarEnabled[bar_label]:
                         print(f"firing sound {bar_label}")
                         soundPool.submit(play_sound, bar_label)
                     pressed_bar_distance_info[bar_label] = dist
+                    isBarEnabled[bar_label] = False
+
+                # Current finger Leaving a bar
+                else:
+                    # distance is more than TOUCHING_ZONE_FROM_PIANO_BAR_CENTER and current finger was previously touched
+                    if len(trottle_control[finger]) != 0:
+                        print(f'{finger} is leaving {bar_label}" is enabled')
+                        isBarEnabled[bar_label] = True
+                        # pressed_bar_distance_info[bar_label] = ""
+
+
+
 
         # draw all the piano bars in one loop after knowing which bar(s) are down and also the bar y-axis postion
         for bar in PIANO_BARS:
