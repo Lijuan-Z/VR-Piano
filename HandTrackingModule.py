@@ -22,7 +22,13 @@ class handDetector():
 
         # detecting hands
         self.mpHands = mp.solutions.hands
-        self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.modeComplexity, self.detectionCon, self.trackCon)
+        self.hands = self.mpHands.Hands(
+            static_image_mode=False,  # Whether to treat input images as a batch of static images or a video stream
+            max_num_hands=2,         # Maximum number of hands to detect
+            min_detection_confidence=0.5,  # Minimum confidence value to consider detection successful
+            min_tracking_confidence=0.5    # Minimum confidence for hand tracking to be considered successful
+        )
+
         self.mpDraw = mp.solutions.drawing_utils  # the 21 dot matrix of the hand
 
     def findHands(self, img, draw=True):

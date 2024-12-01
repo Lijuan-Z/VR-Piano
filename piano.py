@@ -14,7 +14,7 @@ SHOW_FINGERTIP_DOTS_AND_LINES = True
 SHOW_TOP_MESSAGE = True
 SHOW_FPS = True
 
-CVID = 0
+CVID = "/dev/video0"
 CV_DELAY = 1
 wCam, hCam = 1024, 768
 
@@ -80,68 +80,65 @@ FINGERTIPS = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40]
 NUMBER_OF_HANDS = 2 # one or two hands
 
 THROTTLE_THRESHOLD = 100     # if a finger stay at the same bar. This control how many conservative bars to wait before we allow another sound playing
-
 def play_sound(key):
-    match key:
-        case 'LD':
-            playsound("./sound/key05.mp3")
-        case 'LE':
-            playsound("./sound/key06.mp3")
-        case 'LF':
-            playsound("./sound/key07.mp3")
-        case 'LG':
-            playsound("./sound/key08.mp3")
-        case 'A':
-            playsound("./sound/key09.mp3")
-        case 'B':
-            playsound("./sound/key10.mp3")
-        case 'C':
-            playsound("./sound/key11.mp3")
-        case 'D':
-            playsound("./sound/key12.mp3")
-        case 'E':
-            playsound("./sound/key13.mp3")
-        case 'F':
-            playsound("./sound/key14.mp3")
-        case 'G':
-            playsound("./sound/key15.mp3")
-        case 'RA':
-            playsound("./sound/key16.mp3")
-        case 'RB':
-            playsound("./sound/key17.mp3")
-        case 'RC':
-            playsound("./sound/key18.mp3")
-def get_positions_by_bar_name(bar):
-    match bar:
-        case 'LD':
-            return (PIANO_BAR_LD_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'LE':
-            return (PIANO_BAR_LE_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'LF':
-            return (PIANO_BAR_LF_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'LG':
-            return (PIANO_BAR_LG_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'A':
-            return (PIANO_BAR_A_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'B':
-            return (PIANO_BAR_B_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'C':
-            return (PIANO_BAR_C_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[0] + BAR_SIZE_FROM_CENTER,PIANO_BAR_C_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'D':
-            return (PIANO_BAR_D_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[0] + BAR_SIZE_FROM_CENTER,PIANO_BAR_D_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'E':
-            return (PIANO_BAR_E_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[0] + BAR_SIZE_FROM_CENTER,PIANO_BAR_E_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'F':
-            return (PIANO_BAR_F_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'G':
-            return (PIANO_BAR_G_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'RA':
-            return (PIANO_BAR_RA_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'RB':
-            return (PIANO_BAR_RB_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[1] + BAR_SIZE_FROM_CENTER)
-        case 'RC':
-            return (PIANO_BAR_RC_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    if key == 'LD':
+        playsound("./sound/key05.mp3")
+    elif key == 'LE':
+        playsound("./sound/key06.mp3")
+    elif key == 'LF':
+        playsound("./sound/key07.mp3")
+    elif key == 'LG':
+        playsound("./sound/key08.mp3")
+    elif key == 'A':
+        playsound("./sound/key09.mp3")
+    elif key == 'B':
+        playsound("./sound/key10.mp3")
+    elif key == 'C':
+        playsound("./sound/key11.mp3")
+    elif key == 'D':
+        playsound("./sound/key12.mp3")
+    elif key == 'E':
+        playsound("./sound/key13.mp3")
+    elif key == 'F':
+        playsound("./sound/key14.mp3")
+    elif key == 'G':
+        playsound("./sound/key15.mp3")
+    elif key == 'RA':
+        playsound("./sound/key16.mp3")
+    elif key == 'RB':
+        playsound("./sound/key17.mp3")
+    elif key == 'RC':
+        playsound("./sound/key18.mp3")
 
+def get_positions_by_bar_name(bar):
+    if bar == 'LD':
+        return (PIANO_BAR_LD_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'LE':
+        return (PIANO_BAR_LE_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'LF':
+        return (PIANO_BAR_LF_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'LG':
+        return (PIANO_BAR_LG_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'A':
+        return (PIANO_BAR_A_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'B':
+        return (PIANO_BAR_B_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'C':
+        return (PIANO_BAR_C_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'D':
+        return (PIANO_BAR_D_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'E':
+        return (PIANO_BAR_E_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'F':
+        return (PIANO_BAR_F_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'G':
+        return (PIANO_BAR_G_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'RA':
+        return (PIANO_BAR_RA_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'RB':
+        return (PIANO_BAR_RB_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[1] + BAR_SIZE_FROM_CENTER)
+    elif bar == 'RC':
+        return (PIANO_BAR_RC_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[1] + BAR_SIZE_FROM_CENTER)
 
 def draw_single_piano_bar(img, bar, pos):
     # Drawing single piano bar with real-time y-axis of pressed bar
@@ -243,7 +240,7 @@ def main():
     cap.set(4, hCam)
     pTime = 0
 
-    detector = htm.handDetector(min_detection_confidence=0.8)
+    detector = htm.handDetector(min_detection_confidence=0.8, mode=False,max_num_hands=2,model_complexity=1,min_tracking_confidence=0.5)
     # bar_label = ""  # a global variable to know which piano bar it is touching
     trottle_control = {i: [] for i in FINGERTIPS}  # a global variable to store conservative bars, for each finger. It use to prevent keep firing the same key when a finger stay in touching position
     isBarEnabled = {j[2]: True for j in PIANO_BARS} # a variable to store the whether a bar is enabled or disabled, prevent multiple fingers pressing the same bar and play sound
@@ -254,6 +251,9 @@ def main():
         if FRAME_PER_SECOND:
             time.sleep(FRAME_PER_SECOND)
         success, img = cap.read() # initialize cv
+        if not success:
+            print("No image")
+            break
         img = cv2.flip(img, 1) # mirror the image so that it is normal facing
         img = detector.findHands(img) # self create drawing hands class
         lmList = detector.findPosition(img, handNum=NUMBER_OF_HANDS, draw=False)
