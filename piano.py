@@ -6,6 +6,7 @@ import HandTrackingModule as htm
 import VerticalMotionDetector as vmd
 import concurrent.futures
 from playsound import playsound
+import pygame
 
 soundPool = concurrent.futures.ThreadPoolExecutor(max_workers=20)
 
@@ -15,7 +16,8 @@ SHOW_FINGERTIP_DOTS_AND_LINES = True
 SHOW_TOP_MESSAGE = True
 SHOW_FPS = True
 
-CVID = "/dev/video0"
+CVID = 0
+# CVID = "/dev/video0"
 CV_DELAY = 1
 wCam, hCam = 1024, 768
 
@@ -85,35 +87,42 @@ NUMBER_OF_HANDS = 2 # one or two hands
 
 THROTTLE_THRESHOLD = 100     # if a finger stay at the same bar. This control how many conservative bars to wait before we allow another sound playing
 
-def play_sound(key):
-    if key == 'LD':
-        playsound("./sound/key05.mp3")
-    elif key == 'LE':
-        playsound("./sound/key06.mp3")
-    elif key == 'LF':
-        playsound("./sound/key07.mp3")
-    elif key == 'LG':
-        playsound("./sound/key08.mp3")
-    elif key == 'A':
-        playsound("./sound/key09.mp3")
-    elif key == 'B':
-        playsound("./sound/key10.mp3")
-    elif key == 'C':
-        playsound("./sound/key11.mp3")
-    elif key == 'D':
-        playsound("./sound/key12.mp3")
-    elif key == 'E':
-        playsound("./sound/key13.mp3")
-    elif key == 'F':
-        playsound("./sound/key14.mp3")
-    elif key == 'G':
-        playsound("./sound/key15.mp3")
-    elif key == 'RA':
-        playsound("./sound/key16.mp3")
-    elif key == 'RB':
-        playsound("./sound/key17.mp3")
-    elif key == 'RC':
-        playsound("./sound/key18.mp3")
+def load_sound_files(sound_list, pygame):
+    sound_list['B'] = pygame.mixer.Sound('./sound/key10.mp3')
+    sound_list['C'] = pygame.mixer.Sound('./sound/key11.mp3')
+    sound_list['D'] = pygame.mixer.Sound('./sound/key12.mp3')
+    sound_list['E'] = pygame.mixer.Sound('./sound/key13.mp3')
+
+
+
+    # if key == 'LD':
+    #     playsound("./sound/key05.mp3")
+    # elif key == 'LE':
+    #     playsound("./sound/key06.mp3")
+    # elif key == 'LF':
+    #     playsound("./sound/key07.mp3")
+    # elif key == 'LG':
+    #     playsound("./sound/key08.mp3")
+    # elif key == 'A':
+    #     playsound("./sound/key09.mp3")
+    # elif key == 'B':
+    #     playsound("./sound/key10.mp3")
+    # elif key == 'C':
+    #     playsound("./sound/key11.mp3")
+    # elif key == 'D':
+    #     playsound("./sound/key12.mp3")
+    # elif key == 'E':
+    #     playsound("./sound/key13.mp3")
+    # elif key == 'F':
+    #     playsound("./sound/key14.mp3")
+    # elif key == 'G':
+    #     playsound("./sound/key15.mp3")
+    # elif key == 'RA':
+    #     playsound("./sound/key16.mp3")
+    # elif key == 'RB':
+    #     playsound("./sound/key17.mp3")
+    # elif key == 'RC':
+    #     playsound("./sound/key18.mp3")
 
 def get_positions_by_bar_name(bar):
     if bar == 'LD':
@@ -272,6 +281,13 @@ def main():
     cap.set(4, hCam)
     pTime = 0
 
+    """ sound test """
+    sound_list = dict()
+    pygame.mixer.init()
+    load_sound_files(sound_list, pygame)
+
+
+
     detector = htm.handDetector(min_detection_confidence=0.8)
     vmDetect = vmd.VerticalMotionDetector(sensitivity_level=VM_SENSITIVITY)
     trottle_control = {i: [] for i in FINGERTIPS}  # a global variable to store conservative bars, for each finger. It use to prevent keep firing the same key when a finger stay in touching position
@@ -281,8 +297,8 @@ def main():
 
     # control buttons
     cv2.createTrackbar("V.Motion", "Img", 3, 10, nothing)
-    cv2.createTrackbar("P.Bars", "Img", 1, 14, nothing)
-    cv2.createTrackbar("Fingertips", "Img", 10, 10, nothing)
+    cv2.createTrackbar("P.Bars", "Img", 3, 14, nothing)
+    cv2.createTrackbar("Fingertips", "Img", 3, 10, nothing)
     cv2.createTrackbar("Hands", "Img", 2, 2, nothing)
     cv2.createTrackbar("Dots-Lines", "Img", 1, 1, nothing)
     cv2.createTrackbar("Message", "Img", 1, 1, nothing)
@@ -334,7 +350,8 @@ def main():
                     if isBarEnabled[bar_label] and vmDetect.is_vertical_motion(finger, bar_label):
                     # if isBarEnabled[bar_label]:
                         print(f"firing sound {bar_label}")
-                        soundPool.submit(play_sound, bar_label)
+                        # soundPool.submit(play_sound, bar_label)
+                        sound_list[bar_label].play()
                     isBarEnabled[bar_label] = False
 
                 # Current finger Leaving a bar
