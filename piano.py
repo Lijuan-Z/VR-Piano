@@ -143,7 +143,7 @@ def get_positions_by_bar_name(bar):
 def draw_single_piano_bar(img, bar, pos):
     # Drawing single piano bar with real-time y-axis of pressed bar
     # print(bar, bar_label)
-    print(f"pos {bar}: ", pos)
+    print(f"pos {bar}: {pos}")
     x1, y1, x2, y2 = get_positions_by_bar_name(bar)
     if pos is not None:
         # bar down
