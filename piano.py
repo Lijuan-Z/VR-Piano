@@ -115,35 +115,6 @@ def play_sound(key):
     elif key == 'RC':
         playsound("./sound/key18.mp3")
 
-    # match key:
-    #     case 'LD':
-    #         playsound("./sound/key05.mp3")
-    #     case 'LE':
-    #         playsound("./sound/key06.mp3")
-    #     case 'LF':
-    #         playsound("./sound/key07.mp3")
-    #     case 'LG':
-    #         playsound("./sound/key08.mp3")
-    #     case 'A':
-    #         playsound("./sound/key09.mp3")
-    #     case 'B':
-    #         playsound("./sound/key10.mp3")
-    #     case 'C':
-    #         playsound("./sound/key11.mp3")
-    #     case 'D':
-    #         playsound("./sound/key12.mp3")
-    #     case 'E':
-    #         playsound("./sound/key13.mp3")
-    #     case 'F':
-    #         playsound("./sound/key14.mp3")
-    #     case 'G':
-    #         playsound("./sound/key15.mp3")
-    #     case 'RA':
-    #         playsound("./sound/key16.mp3")
-    #     case 'RB':
-    #         playsound("./sound/key17.mp3")
-    #     case 'RC':
-    #         playsound("./sound/key18.mp3")
 def get_positions_by_bar_name(bar):
     if bar == 'LD':
         return (PIANO_BAR_LD_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] - BAR_SIZE_FROM_CENTER,
@@ -187,35 +158,6 @@ def get_positions_by_bar_name(bar):
     elif bar == 'RC':
         return (PIANO_BAR_RC_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[1] - BAR_SIZE_FROM_CENTER,
                 PIANO_BAR_RC_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    # match bar:
-    #     case 'LD':
-    #         return (PIANO_BAR_LD_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'LE':
-    #         return (PIANO_BAR_LE_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'LF':
-    #         return (PIANO_BAR_LF_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'LG':
-    #         return (PIANO_BAR_LG_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'A':
-    #         return (PIANO_BAR_A_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'B':
-    #         return (PIANO_BAR_B_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'C':
-    #         return (PIANO_BAR_C_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[0] + BAR_SIZE_FROM_CENTER,PIANO_BAR_C_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'D':
-    #         return (PIANO_BAR_D_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[0] + BAR_SIZE_FROM_CENTER,PIANO_BAR_D_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'E':
-    #         return (PIANO_BAR_E_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[0] + BAR_SIZE_FROM_CENTER,PIANO_BAR_E_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'F':
-    #         return (PIANO_BAR_F_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'G':
-    #         return (PIANO_BAR_G_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'RA':
-    #         return (PIANO_BAR_RA_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'RB':
-    #         return (PIANO_BAR_RB_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[1] + BAR_SIZE_FROM_CENTER)
-    #     case 'RC':
-    #         return (PIANO_BAR_RC_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[1] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[1] + BAR_SIZE_FROM_CENTER)
 
 
 def draw_single_piano_bar(img, bar, pos):
@@ -321,6 +263,7 @@ def main():
     global SHOW_TOP_MESSAGE
     global FINGERTIPS
     global NUMBER_OF_HANDS
+    global PIANO_BARS
 
     """ initialize variable"""
     cv2.namedWindow("Img")
@@ -338,7 +281,7 @@ def main():
 
     # control buttons
     cv2.createTrackbar("V.Motion", "Img", 3, 10, nothing)
-    # cv2.createTrackbar("FPS", "Img", 30, 30, nothing)
+    cv2.createTrackbar("P.Bars", "Img", 1, 14, nothing)
     cv2.createTrackbar("Fingertips", "Img", 10, 10, nothing)
     cv2.createTrackbar("Hands", "Img", 2, 2, nothing)
     cv2.createTrackbar("Dots-Lines", "Img", 1, 1, nothing)
@@ -471,13 +414,57 @@ def main():
         ft_value = cv2.getTrackbarPos("Fingertips", "Img")
         NUMBER_OF_HANDS = cv2.getTrackbarPos("Hands", "Img")
         SHOW_FINGERTIP_DOTS_AND_LINES = cv2.getTrackbarPos("Dots-Lines", "Img")
-        # fps = cv2.getTrackbarPos("FPS", "Img")
+        num_p_bars = cv2.getTrackbarPos("P.Bars", "Img")
         SHOW_TOP_MESSAGE = cv2.getTrackbarPos("Message", "Img")
 
-        # if fps == 0:
-        #     FRAME_PER_SECOND == None
-        # else:
-        #     FRAME_PER_SECOND = np.interp(fps, [1, 30], [1, 1/60])
+        if num_p_bars == 1:
+            PIANO_BARS = [PIANO_BAR_C_CENTER]
+        elif num_p_bars == 2:
+            PIANO_BARS = [PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER]
+        elif num_p_bars == 3:
+            PIANO_BARS = [PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER]
+        elif num_p_bars == 4:
+            PIANO_BARS = [PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER]
+        elif num_p_bars == 5:
+            PIANO_BARS = [PIANO_BAR_A_CENTER, PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER,
+                          PIANO_BAR_E_CENTER]
+        elif num_p_bars == 6:
+            PIANO_BARS = [PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER, PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER,
+                          PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER]
+        elif num_p_bars == 7:
+            PIANO_BARS = [PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER, PIANO_BAR_B_CENTER,
+                          PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER]
+        elif num_p_bars == 8:
+            PIANO_BARS = [PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER]
+        elif num_p_bars == 9:
+            PIANO_BARS = [PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
+                          PIANO_BAR_G_CENTER]
+
+        elif num_p_bars == 10:
+            PIANO_BARS = [PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
+                          PIANO_BAR_G_CENTER]
+        elif num_p_bars == 11:
+            PIANO_BARS = [PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
+                          PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER]
+        elif num_p_bars == 12:
+            PIANO_BARS = [PIANO_BAR_LD_CENTER, PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
+                          PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER]
+        elif num_p_bars == 13:
+            PIANO_BARS = [PIANO_BAR_LD_CENTER, PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
+                          PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER, PIANO_BAR_RB_CENTER]
+        else:
+            PIANO_BARS = [PIANO_BAR_LD_CENTER, PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER,
+                          PIANO_BAR_A_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER,
+                          PIANO_BAR_F_CENTER,
+                          PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER, PIANO_BAR_RB_CENTER, PIANO_BAR_RC_CENTER]
+
 
         if ft_value == 1:
             FINGERTIPS = [4]
