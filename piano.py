@@ -10,7 +10,7 @@ import threading
 # from playsound import playsound
 
 # soundPool = concurrent.futures.ThreadPoolExecutor(max_workers=20)
-import GestureRecognizerModule as ges
+# import GestureRecognizerModule as ges
 
 # ML control
 GESTURE_RECOGNITION = True
@@ -307,7 +307,7 @@ def main():
     global FINGERTIPS
     global NUMBER_OF_HANDS
     global PIANO_BARS
-    gesture = ges.gestureDetector()
+    # gesture = ges.gestureDetector()
     global BAR_LENGTH_ADJUSTMENT
 
     """ initialize variable"""
@@ -354,13 +354,13 @@ def main():
 
         # draw finger pt and lines
         if len(lmList) != 0:
-            GESTURE_RECOGNITION = gesture.is_play(img_rgb)
-            if GESTURE_RECOGNITION:
-                cv2.putText(img, f'GESTURE IS ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
-                            0.4, (128,255,0), FPS_FONT_THINKNESS)
-            else:
-                cv2.putText(img, f'GESTURE IS NOT ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
-                           0.4, (128, 0, 255), FPS_FONT_THINKNESS)
+            # GESTURE_RECOGNITION = gesture.is_play(img_rgb)
+            # if GESTURE_RECOGNITION:
+            #     cv2.putText(img, f'GESTURE IS ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
+            #                 0.4, (128,255,0), FPS_FONT_THINKNESS)
+            # else:
+            #     cv2.putText(img, f'GESTURE IS NOT ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
+            #                0.4, (128, 0, 255), FPS_FONT_THINKNESS)
 
             CURRENTFINGERTIPS = FINGERTIPS
             if len(lmList) <= 21:
