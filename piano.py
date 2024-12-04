@@ -31,7 +31,7 @@ FPS_X_LOCATION, FPS_Y_LOCATION = 30, 40
 FPS_FONT = cv2.FONT_HERSHEY_COMPLEX
 FPS_FONT_SCALE, FPS_FONT_THINKNESS = 1, 2
 FPS_FONT_COLOR = (255, 0, 0)
-TOP_RIGHT_MSG_COLOR = (75, 0, 130)
+TOP_RIGHT_MSG_COLOR = (255, 255, 255)
 
 # Finger drawing
 FINGER_DOT_SIZE = 7
@@ -58,6 +58,7 @@ TOUCHING_ZONE_WIDTH_DEDUCTION = 0 #10
 
 # Vertical motion
 VM_SENSITIVITY = 3
+VM_UPWARD_SENSITIVITY = 8
 
 # Piano bar position properites
 PIANO_BAR_COLOR = (0, 255, 0)
@@ -299,6 +300,7 @@ def nothing(x):
 def main():
 
     """controlable variables"""
+    global VM_UPWARD_SENSITIVITY
     global VM_SENSITIVITY
     global SHOW_FINGERTIP_DOTS_AND_LINES
     global SHOW_TOP_MESSAGE
@@ -326,7 +328,8 @@ def main():
     pressed_bar_distance_info = dict() # initialize, info for calling piano_bar function
 
     # control buttons
-    cv2.createTrackbar("V.Motion", "Img", 2, 10, nothing)
+    cv2.createTrackbar("UP.Motion", "Img", 5, 20, nothing)
+    cv2.createTrackbar("DWN.Motion", "Img", 3, 10, nothing)
     cv2.createTrackbar("P.Bars", "Img", 5, 14, nothing)
     cv2.createTrackbar("Bars-Length", "Img", 80, 300, nothing)
     cv2.createTrackbar("Fingertips", "Img", 5, 10, nothing)
@@ -385,13 +388,11 @@ def main():
                         # consider touching
                     print(f"finger {finger} is touched a bar {bar_label} with distance: {dist}")
                     # print(finger, trottle_control)
-                    print(f"is vertical motion detected? {vmDetect.is_vertical_motion(finger, bar_label)}")
+                    # print(vmDetect.is_vertical_motion(finger, bar_label))
                     pressed_bar_distance_info[bar_label] = dist
-
-
                     # Tracking conservative bars. Not playing sound if the finger is keep staying
                     throttle_controller(trottle_control, finger, bar_label)
-
+                    print(f"is upward motion? {vmDetect.is_upward_vertical_motion(finger, bar_label)} downward? {vmDetect.is_vertical_motion(finger, bar_label)}")
                     # only play a sound if the bar is enabled AND is a vertical motion
                     # if isBarEnabled[bar_label] and vmDetect.is_vertical_motion(finger, bar_label):
                     if isBarEnabled[bar_label]:
@@ -476,7 +477,8 @@ def main():
         cv2.waitKey(CV_DELAY)
 
         # add controls
-        VM_SENSITIVITY = cv2.getTrackbarPos("V.Motion", "Img")
+        VM_UPWARD_SENSITIVITY = cv2.getTrackbarPos("UP.Motion", "Img")
+        VM_SENSITIVITY = cv2.getTrackbarPos("DWN.Motion", "Img")
         ft_value = cv2.getTrackbarPos("Fingertips", "Img")
         bar_length_adj = cv2.getTrackbarPos("Bars-Length", "Img")
         NUMBER_OF_HANDS = cv2.getTrackbarPos("Hands", "Img")
