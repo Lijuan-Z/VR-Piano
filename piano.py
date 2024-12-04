@@ -10,6 +10,10 @@ import threading
 # from playsound import playsound
 
 # soundPool = concurrent.futures.ThreadPoolExecutor(max_workers=20)
+import GestureRecognizerModule as ges
+
+# ML control
+GESTURE_RECOGNITION = True
 
 # screen control
 FRAME_PER_SECOND = None  # 0.1 means 10 frame per second, 0.5 means 2 frame per second. Put "None" if you want the fastest output
@@ -253,35 +257,37 @@ def finger_to_keys_distance(img, finger, finger_position_arr, vmDetect):
             # First we store the upward action
             # Second, we also check whether the action is an upward motion, if not, we ignore this
             # if yes, it qualify as a piano action. A ready state
-            vmDetect.store_upward_motion(finger, bar[2], finger_position_arr[1])
+            if GESTURE_RECOGNITION:
+                # print(f"ges: {GESTURE_RECOGNITION}")
+                vmDetect.store_upward_motion(finger, bar[2], finger_position_arr[1])
 
-            if vmDetect.is_upward_vertical_motion(finger, bar[2]):
-                finger_starting_point = vmDetect.get_upward_motion_starting_point(finger, bar[2])
-                if finger_starting_point is not None:
-                    # detected a proper upward motion
-                    distance = math.hypot(finger_position_arr[0] - bar[0], finger_starting_point - bar[1])
-                    # print(f"upward: finger-{finger} {distance} {finger_starting_point}, {bar[1]}")
-                    # print(f"get upward motion: {vmDetect.get_upward_motions()}")
-                    # old distance: finger to bar approach
-                    # distance = math.hypot(finger_position_arr[0] - bar[0], finger_position_arr[1] - bar[1])
-                    # if bar[1] - finger_position_arr[1] < 0:
-                    # if bar[1] - finger_starting_point < 0:
-                    #     distance = -distance
+                if vmDetect.is_upward_vertical_motion(finger, bar[2]):
+                    finger_starting_point = vmDetect.get_upward_motion_starting_point(finger, bar[2])
+                    if finger_starting_point is not None:
+                        # detected a proper upward motion
+                        distance = math.hypot(finger_position_arr[0] - bar[0], finger_starting_point - bar[1])
+                        # print(f"upward: finger-{finger} {distance} {finger_starting_point}, {bar[1]}")
+                        # print(f"get upward motion: {vmDetect.get_upward_motions()}")
+                        # old distance: finger to bar approach
+                        # distance = math.hypot(finger_position_arr[0] - bar[0], finger_position_arr[1] - bar[1])
+                        # if bar[1] - finger_position_arr[1] < 0:
+                        # if bar[1] - finger_starting_point < 0:
+                        #     distance = -distance
 
-                    # print(f"in key {bar[2]}, {distance}")
-                    # if distance <= READY_ZONE:
-                        # print(f"READY_ZONE {bar[2]}, {distance}")
+                        # print(f"in key {bar[2]}, {distance}")
+                        # if distance <= READY_ZONE:
+                            # print(f"READY_ZONE {bar[2]}, {distance}")
 
-                    if SHOW_FINGERTIP_DOTS_AND_LINES:
-                        # draw on finger
-                        cv2.circle(img, (finger_position_arr[0], finger_position_arr[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
-                        # draw line
-                        cv2.line(img, (finger_position_arr[0], finger_position_arr[1]), (bar[0], bar[1]), LINE_FROM_FINGER_COLOR, LINE_FROM_FINGER_THICKNESS)
-                        # draw dots on bar also
-                        cv2.circle(img, (bar[0], bar[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
+                        if SHOW_FINGERTIP_DOTS_AND_LINES:
+                            # draw on finger
+                            cv2.circle(img, (finger_position_arr[0], finger_position_arr[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
+                            # draw line
+                            cv2.line(img, (finger_position_arr[0], finger_position_arr[1]), (bar[0], bar[1]), LINE_FROM_FINGER_COLOR, LINE_FROM_FINGER_THICKNESS)
+                            # draw dots on bar also
+                            cv2.circle(img, (bar[0], bar[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
 
-                    # return the ready distance and also the bar label
-                    return (distance, bar[2])
+                        # return the ready distance and also the bar label
+                        return (distance, bar[2])
 
     return (math.inf, "")
 
@@ -299,6 +305,7 @@ def main():
     global FINGERTIPS
     global NUMBER_OF_HANDS
     global PIANO_BARS
+    gesture = ges.gestureDetector()
     global BAR_LENGTH_ADJUSTMENT
 
     """ initialize variable"""
@@ -319,10 +326,10 @@ def main():
     pressed_bar_distance_info = dict() # initialize, info for calling piano_bar function
 
     # control buttons
-    cv2.createTrackbar("V.Motion", "Img", 3, 10, nothing)
-    cv2.createTrackbar("P.Bars", "Img", 1, 14, nothing)
-    cv2.createTrackbar("Bars-Length", "Img", 1, 300, nothing)
-    cv2.createTrackbar("Fingertips", "Img", 1, 10, nothing)
+    cv2.createTrackbar("V.Motion", "Img", 2, 10, nothing)
+    cv2.createTrackbar("P.Bars", "Img", 5, 14, nothing)
+    cv2.createTrackbar("Bars-Length", "Img", 80, 300, nothing)
+    cv2.createTrackbar("Fingertips", "Img", 5, 10, nothing)
     cv2.createTrackbar("Hands", "Img", 2, 2, nothing)
     cv2.createTrackbar("Dots-Lines", "Img", 1, 1, nothing)
     cv2.createTrackbar("Message", "Img", 1, 1, nothing)
@@ -333,7 +340,7 @@ def main():
             time.sleep(FRAME_PER_SECOND)
         success, img = cap.read() # initialize cv
         img = cv2.flip(img, 1) # mirror the image so that it is normal facing
-        # result = gesture_recognizer.is_play(img)
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES) # self create drawing hands class
         if not success:
             print("No image")
@@ -341,11 +348,18 @@ def main():
         img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES)  # self create drawing hands class
         lmList = detector.findPosition(img, handNum=NUMBER_OF_HANDS, draw=False)
 
-        # result = gesture_recognizer.is_play(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        # print(f"GR: {result}")
+
 
         # draw finger pt and lines
         if len(lmList) != 0:
+            GESTURE_RECOGNITION = gesture.is_play(img_rgb)
+            if GESTURE_RECOGNITION:
+                cv2.putText(img, f'GESTURE IS ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
+                            0.4, (128,255,0), FPS_FONT_THINKNESS)
+            else:
+                cv2.putText(img, f'GESTURE IS NOT ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
+                           0.4, (128, 0, 255), FPS_FONT_THINKNESS)
+
             CURRENTFINGERTIPS = FINGERTIPS
             if len(lmList) <= 21:
                 # only one hand detected
