@@ -18,6 +18,7 @@ SHOW_TOP_MESSAGE = True
 SHOW_FPS = True
 
 CVID = 0
+# CVID = "/dev/video0"
 CV_DELAY = 1
 wCam, hCam = 640, 480
 
@@ -307,8 +308,8 @@ def main():
 
     # control buttons
     cv2.createTrackbar("V.Motion", "Img", 3, 10, nothing)
-    cv2.createTrackbar("P.Bars", "Img", 1, 14, nothing)
-    cv2.createTrackbar("Fingertips", "Img", 10, 10, nothing)
+    cv2.createTrackbar("P.Bars", "Img", 3, 14, nothing)
+    cv2.createTrackbar("Fingertips", "Img", 3, 10, nothing)
     cv2.createTrackbar("Hands", "Img", 2, 2, nothing)
     cv2.createTrackbar("Dots-Lines", "Img", 1, 1, nothing)
     cv2.createTrackbar("Message", "Img", 1, 1, nothing)
@@ -349,6 +350,7 @@ def main():
                     # consider touching
                     # print(f"finger {finger} is touched a bar {bar_label} with distance: {dist}")
                     pressed_bar_distance_info[bar_label] = dist
+
 
                     # Tracking conservative bars. Not playing sound if the finger is keep staying
                     throttle_controller(trottle_control, finger, bar_label)
