@@ -345,7 +345,6 @@ def main():
         if not success:
             print("No image")
             break
-        img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES)  # self create drawing hands class
         lmList = detector.findPosition(img, handNum=NUMBER_OF_HANDS, draw=False)
 
 
@@ -379,14 +378,14 @@ def main():
                 vmDetect.store_downward_motion(finger, bar_label, y2)
                 if bar_label != '' and dist < TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
                     isBarEnabled[bar_label] = True
-                    print(f"here: {dist}, {bar_label}, {TOUCHING_ZONE_FROM_PIANO_BAR_CENTER}")
+                    # print(f"here: {dist}, {bar_label}, {TOUCHING_ZONE_FROM_PIANO_BAR_CENTER}")
                     # Current finger Entering a bar
                     # if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
                     # if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER + BAR_LENGTH_ADJUSTMENT:
                         # consider touching
                     print(f"finger {finger} is touched a bar {bar_label} with distance: {dist}")
-                    print(finger, trottle_control)
-                    print(vmDetect.is_vertical_motion(finger, bar_label))
+                    # print(finger, trottle_control)
+                    print(f"is vertical motion detected? {vmDetect.is_vertical_motion(finger, bar_label)}")
                     pressed_bar_distance_info[bar_label] = dist
 
 
@@ -396,7 +395,7 @@ def main():
                     # only play a sound if the bar is enabled AND is a vertical motion
                     # if isBarEnabled[bar_label] and vmDetect.is_vertical_motion(finger, bar_label):
                     if isBarEnabled[bar_label]:
-                    #     print(f"firing sound {bar_label}")
+                        print(f"firing ONE sound {bar_label}")
                         #soundPool.submit(play_sound, bar_label)
                         play_sound(bar_label)
                         isBarEnabled[bar_label] = False
