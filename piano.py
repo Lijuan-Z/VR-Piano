@@ -4,10 +4,9 @@ import numpy as np
 import math
 import HandTrackingModule as htm
 import VerticalMotionDetector as vmd
-import GestureRecognizerModule as grm
 import concurrent.futures
 from playsound import playsound
-
+import GestureRecognizerModule as ges
 soundPool = concurrent.futures.ThreadPoolExecutor(max_workers=20)
 
 # screen control
@@ -281,6 +280,7 @@ def main():
     global FINGERTIPS
     global NUMBER_OF_HANDS
     global PIANO_BARS
+    gesture = ges.gestureDetector()
     global BAR_LENGTH_ADJUSTMENT
 
     """ initialize variable"""
@@ -289,9 +289,6 @@ def main():
     cap.set(3, wCam)
     cap.set(4, hCam)
     pTime = 0
-
-    """other ML"""
-    gesture_recognizer = grm.gestureDetector()
 
     detector = htm.handDetector(min_detection_confidence=0.8)
     vmDetect = vmd.VerticalMotionDetector(sensitivity_level=VM_SENSITIVITY)
@@ -315,15 +312,19 @@ def main():
             time.sleep(FRAME_PER_SECOND)
         success, img = cap.read() # initialize cv
         img = cv2.flip(img, 1) # mirror the image so that it is normal facing
-        # result = gesture_recognizer.is_play(img)
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES) # self create drawing hands class
         lmList = detector.findPosition(img, handNum=NUMBER_OF_HANDS, draw=False)
 
-        # result = gesture_recognizer.is_play(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        # print(f"GR: {result}")
+
 
         # draw finger pt and lines
         if len(lmList) != 0:
+            result = gesture.is_play(img_rgb)
+            print("****************************")
+            print(result)
+            print("****************************")
+
             CURRENTFINGERTIPS = FINGERTIPS
             if len(lmList) <= 21:
                 # only one hand detected
