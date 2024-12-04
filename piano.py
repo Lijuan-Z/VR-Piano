@@ -4,6 +4,7 @@ import numpy as np
 import math
 import HandTrackingModule as htm
 import VerticalMotionDetector as vmd
+import GestureRecognizerModule as grm
 import concurrent.futures
 from playsound import playsound
 
@@ -226,8 +227,8 @@ def finger_to_keys_distance(img, finger, finger_position_arr, vmDetect):
             # print(f"{bar[2]} is testing range {LEFT_TOUCHING_MARGIN} > {finger_position_arr[0]} < {RIGHT_TOUCHING_MARGIN}")
             if SHOW_FINGERTIP_DOTS_AND_LINES:
                 # The red square
-                cv2.rectangle(img, (LEFT_TOUCHING_MARGIN, PIANO_BARS_CENTER_POS[1] - TOUCHING_ZONE_FROM_PIANO_BAR_CENTER), (RIGHT_TOUCHING_MARGIN, PIANO_BARS_CENTER_POS[1]), TOUCHING_ZONE_COLOR, cv2.FILLED)
-
+                # cv2.rectangle(img, (LEFT_TOUCHING_MARGIN, PIANO_BARS_CENTER_POS[1] - TOUCHING_ZONE_FROM_PIANO_BAR_CENTER), (RIGHT_TOUCHING_MARGIN, PIANO_BARS_CENTER_POS[1]), TOUCHING_ZONE_COLOR, cv2.FILLED)
+                pass
         # if within the bar width, calculate distance, draw line if within ready zone
 
             # new: treat every finger point as starting, and set starting distance if we see an upward motion
@@ -289,6 +290,9 @@ def main():
     cap.set(4, hCam)
     pTime = 0
 
+    """other ML"""
+    gesture_recognizer = grm.gestureDetector()
+
     detector = htm.handDetector(min_detection_confidence=0.8)
     vmDetect = vmd.VerticalMotionDetector(sensitivity_level=VM_SENSITIVITY)
     trottle_control = {i: [] for i in FINGERTIPS}  # a global variable to store conservative bars, for each finger. It use to prevent keep firing the same key when a finger stay in touching position
@@ -311,10 +315,12 @@ def main():
             time.sleep(FRAME_PER_SECOND)
         success, img = cap.read() # initialize cv
         img = cv2.flip(img, 1) # mirror the image so that it is normal facing
+        # result = gesture_recognizer.is_play(img)
         img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES) # self create drawing hands class
         lmList = detector.findPosition(img, handNum=NUMBER_OF_HANDS, draw=False)
 
-
+        # result = gesture_recognizer.is_play(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        # print(f"GR: {result}")
 
         # draw finger pt and lines
         if len(lmList) != 0:
@@ -331,16 +337,20 @@ def main():
                 dist, bar_label = finger_to_keys_distance(img, finger, [x2, y2], vmDetect) # return the distance and draw the line if distance is short enough
 
                 # print(finger, isBarEnabled)
-                # print(finger, isBarEnabled, trottle_control)
+
 
                 # As motion is in ready state, add to vertical motion detector for vertical motion detection later
                 vmDetect.store_downward_motion(finger, bar_label, y2)
-                print(f"here: {dist}, {bar_label}, {TOUCHING_ZONE_FROM_PIANO_BAR_CENTER}")
-                # Current finger Entering a bar
-                if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
-                # if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER + BAR_LENGTH_ADJUSTMENT:
-                    # consider touching
+                if bar_label != '' and dist < TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
+                    isBarEnabled[bar_label] = True
+                    print(f"here: {dist}, {bar_label}, {TOUCHING_ZONE_FROM_PIANO_BAR_CENTER}")
+                    # Current finger Entering a bar
+                    # if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
+                    # if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER + BAR_LENGTH_ADJUSTMENT:
+                        # consider touching
                     print(f"finger {finger} is touched a bar {bar_label} with distance: {dist}")
+                    print(finger, trottle_control)
+                    print(vmDetect.is_vertical_motion(finger, bar_label))
                     pressed_bar_distance_info[bar_label] = dist
 
 
@@ -348,19 +358,19 @@ def main():
                     throttle_controller(trottle_control, finger, bar_label)
 
                     # only play a sound if the bar is enabled AND is a vertical motion
-                    if isBarEnabled[bar_label] and vmDetect.is_vertical_motion(finger, bar_label):
-                    # if isBarEnabled[bar_label]:
+                    # if isBarEnabled[bar_label] and vmDetect.is_vertical_motion(finger, bar_label):
+                    if isBarEnabled[bar_label]:
                     #     print(f"firing sound {bar_label}")
                         soundPool.submit(play_sound, bar_label)
-                    isBarEnabled[bar_label] = False
+                        isBarEnabled[bar_label] = False
 
-                # Current finger Leaving a bar
-                else:
-                    # distance is more than TOUCHING_ZONE_FROM_PIANO_BAR_CENTER and current finger was previously touched
-                    trottle_control[finger] = []
-                    # print(f'{finger} is leaving {bar_label}" is enabled')
-                    isBarEnabled[bar_label] = True
-                    pressed_bar_distance_info[bar_label] = None
+                    # Current finger Leaving a bar
+                    # else:
+                    #     # distance is more than TOUCHING_ZONE_FROM_PIANO_BAR_CENTER and current finger was previously touched
+                    #     trottle_control[finger] = []
+                    #     # print(f'{finger} is leaving {bar_label}" is enabled')
+                    #     isBarEnabled[bar_label] = True
+                    #     pressed_bar_distance_info[bar_label] = None
 
                 # cv2.putText(img, f'finger {finger} distance: {dist}', (40, FPS_Y_LOCATION + 60), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1) #tmp
                 # cv2.putText(img, f'finger {finger} pressed_bar_distance_info: {pressed_bar_distance_info}', (40, FPS_Y_LOCATION + 80), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1) #tmp

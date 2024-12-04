@@ -1,6 +1,7 @@
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
+import numpy as np
 
 class gestureDetector():
     def __init__(self):
@@ -8,8 +9,9 @@ class gestureDetector():
         options = vision.GestureRecognizerOptions(base_options=base_options)
         self.recognizer = vision.GestureRecognizer.create_from_options(options)
 
-    def is_play(self,image_file_name):
-        image = mp.Image.create_from_file(image_file_name)
+    def is_play(self,image):
+        # image = mp.Image.create_from_file(image)
+        image = mp.Image(format=mp.ImageFormat.SRGB, data=image)
 
         # STEP 4: Recognize gestures in the input image.
         recognition_result = self.recognizer.recognize(image)
@@ -19,5 +21,5 @@ class gestureDetector():
 
 if __name__ == "__main__":
     recognizer = gestureDetector()
-    isplay = recognizer.is_play('hand_image.png')
+    isplay = recognizer.is_play('hand_image.jpg')
     print(isplay)
