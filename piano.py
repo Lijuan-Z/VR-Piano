@@ -309,7 +309,7 @@ def main():
     pTime = 0
 
     """other ML"""
-    gesture_recognizer = grm.gestureDetector()
+    # gesture_recognizer = grm.gestureDetector()
 
     detector = htm.handDetector(min_detection_confidence=0.8)
     vmDetect = vmd.VerticalMotionDetector(sensitivity_level=VM_SENSITIVITY)
@@ -335,11 +335,9 @@ def main():
         img = cv2.flip(img, 1) # mirror the image so that it is normal facing
         # result = gesture_recognizer.is_play(img)
         img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES) # self create drawing hands class
-        success, img = cap.read()  # initialize cv
         if not success:
             print("No image")
             break
-        img = cv2.flip(img, 1)  # mirror the image so that it is normal facing
         img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES)  # self create drawing hands class
         lmList = detector.findPosition(img, handNum=NUMBER_OF_HANDS, draw=False)
 
