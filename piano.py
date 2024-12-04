@@ -37,7 +37,8 @@ LINE_FROM_FINGER_COLOR = (0, 255, 255)
 LINE_FROM_FINGER_THICKNESS = 2
 
 # Size of piano bars in square. e.g. 20 = 40 width * 40 height
-BAR_SIZE_FROM_CENTER = 20  # KEY FACTOR TO CONTROL THE SIZE OF PIANO BARS
+BAR_SIZE_FROM_CENTER = 20       # KEY FACTOR TO CONTROL THE SIZE OF PIANO BARS
+BAR_LENGTH_ADJUSTMENT = BAR_SIZE_FROM_CENTER + 80   # TO MAKE THE BAR LONGER. +NUMBER MEANS SMALLER y-AXIS COORDINATE
 
 # Touching point (hand)
 TOUCHING_POINT_COLOR = (255, 255, 255)
@@ -45,16 +46,16 @@ TOUCHING_POINT_SHAPE = cv2.FILLED
 TOUCHING_POINT_SIZE = 7
 
 # Touching point (piano bar)
-TOUCHING_ZONE_FROM_PIANO_BAR_CENTER = BAR_SIZE_FROM_CENTER  # KEY FACTOR TO DEFINE THE STARTING POINT OF TOUCH IN Y-AXIS
-READY_ZONE = 80
+TOUCHING_ZONE_FROM_PIANO_BAR_CENTER = BAR_SIZE_FROM_CENTER + BAR_LENGTH_ADJUSTMENT  # KEY FACTOR TO DEFINE THE STARTING POINT OF TOUCH IN Y-AXIS
+READY_ZONE = 80 + BAR_LENGTH_ADJUSTMENT
 BAR_DOWN_RANGE = (-20, TOUCHING_ZONE_FROM_PIANO_BAR_CENTER)
 TOUCHING_ZONE_COLOR = (0, 0, 255)
-TOUCHING_ZONE_WIDTH_DEDUCTION = 0  # 10
+TOUCHING_ZONE_WIDTH_DEDUCTION = 0 #10
 
 # Vertical motion
 VM_SENSITIVITY = 3
 
-# Piano bar properites
+# Piano bar position properites
 PIANO_BAR_COLOR = (0, 255, 0)
 PIANO_BARS_CENTER_POS = (325, 425)
 PIANO_BAR_LD_CENTER = (PIANO_BARS_CENTER_POS[0] - 12 * BAR_SIZE_FROM_CENTER, PIANO_BARS_CENTER_POS[1], 'LD')
@@ -84,9 +85,9 @@ NOTE_SCALE, NOTE_THINKNESS = 0.6, 2
 # FINGERTIPS = [8] # currently one finger
 # FINGERTIPS = [4, 8, 12, 16, 20]
 FINGERTIPS = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40]
-NUMBER_OF_HANDS = 2  # one or two hands
+NUMBER_OF_HANDS = 2 # one or two hands
 
-THROTTLE_THRESHOLD = 100  # if a finger stay at the same bar. This control how many conservative bars to wait before we allow another sound playing
+THROTTLE_THRESHOLD = 100     # if a finger stay at the same bar. This control how many conservative bars to wait before we allow another sound playing
 
 
 # def play_sound(key):
@@ -136,43 +137,43 @@ def play_sound(key):
 
 def get_positions_by_bar_name(bar):
     if bar == 'LD':
-        return (PIANO_BAR_LD_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_LD_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_LD_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LD_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'LE':
-        return (PIANO_BAR_LE_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_LE_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_LE_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LE_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'LF':
-        return (PIANO_BAR_LF_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_LF_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_LF_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LF_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'LG':
-        return (PIANO_BAR_LG_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_LG_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_LG_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_LG_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'A':
-        return (PIANO_BAR_A_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_A_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_A_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_A_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'B':
-        return (PIANO_BAR_B_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_B_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_B_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_B_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'C':
-        return (PIANO_BAR_C_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_C_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_C_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_C_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'D':
-        return (PIANO_BAR_D_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_D_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_D_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_D_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'E':
-        return (PIANO_BAR_E_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_E_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_E_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_E_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'F':
-        return (PIANO_BAR_F_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_F_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_F_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_F_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'G':
-        return (PIANO_BAR_G_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_G_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_G_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_G_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'RA':
-        return (PIANO_BAR_RA_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_RA_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_RA_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RA_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'RB':
-        return (PIANO_BAR_RB_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[1] - BAR_SIZE_FROM_CENTER,
+        return (PIANO_BAR_RB_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[1] - BAR_LENGTH_ADJUSTMENT,
                 PIANO_BAR_RB_CENTER[0] + BAR_SIZE_FROM_CENTER, PIANO_BAR_RB_CENTER[1] + BAR_SIZE_FROM_CENTER)
     elif bar == 'RC':
         return (PIANO_BAR_RC_CENTER[0] - BAR_SIZE_FROM_CENTER, PIANO_BAR_RC_CENTER[1] - BAR_SIZE_FROM_CENTER,
@@ -188,12 +189,12 @@ def draw_single_piano_bar(img, bar, pos):
         # bar down
         pos = np.interp(pos, [BAR_DOWN_RANGE[0], BAR_DOWN_RANGE[1]], [y2, y1])
 
+
         # cv2.line(img, (x1, int(pos)), (x2, int(pos)), PIANO_BAR_COLOR, 3)  # top, both p1, p2 y move
         cv2.line(img, (x1, y1), (x1, int(pos)), PIANO_BAR_COLOR, 3)  # left,  y2 move
         cv2.line(img, (x2, y1), (x2, int(pos)), PIANO_BAR_COLOR, 3)  # right, y2 move
         cv2.line(img, (x1, y2), (x2, y2), PIANO_BAR_COLOR, 3)  # bottom, never move
-        cv2.rectangle(img, (x1, int(pos)), (x2, y2), PIANO_BAR_COLOR,
-                      cv2.FILLED)  # the filled cube that show when finger is on
+        cv2.rectangle(img, (x1, int(pos)), (x2, y2), PIANO_BAR_COLOR, cv2.FILLED) # the filled cube that show when finger is on
 
     else:
         # No touching, draw normal bar
@@ -205,7 +206,6 @@ def draw_single_piano_bar(img, bar, pos):
     # Put the letter under each key
     cv2.putText(img, bar, (x1 + 5, y2 + 20), NOTE_FONT, NOTE_SCALE, PIANO_BAR_COLOR, NOTE_THINKNESS)
     return pos
-
 
 def throttle_controller(trottle_control, finger, bar):
     # True: wait enough time, allow to play the sound
@@ -230,8 +230,7 @@ def throttle_controller(trottle_control, finger, bar):
         trottle_control[finger] = []
         # return True
 
-
-def finger_to_keys_distance(img, finger_position_arr):
+def finger_to_keys_distance(img, finger, finger_position_arr, vmDetect):
     # 1. determine the closes key by x first, then y
     # 2. determine if the distance is in ready, but not touch
     # 3. determine if it is touch
@@ -245,35 +244,46 @@ def finger_to_keys_distance(img, finger_position_arr):
         if finger_position_arr[0] > LEFT_TOUCHING_MARGIN and finger_position_arr[0] < RIGHT_TOUCHING_MARGIN:
             # print(f"{bar[2]} is testing range {LEFT_TOUCHING_MARGIN} > {finger_position_arr[0]} < {RIGHT_TOUCHING_MARGIN}")
             if SHOW_FINGERTIP_DOTS_AND_LINES:
-                cv2.rectangle(img,
-                              (LEFT_TOUCHING_MARGIN, PIANO_BARS_CENTER_POS[1] - TOUCHING_ZONE_FROM_PIANO_BAR_CENTER),
-                              (RIGHT_TOUCHING_MARGIN, PIANO_BARS_CENTER_POS[1]), TOUCHING_ZONE_COLOR, cv2.FILLED)
+                # The red square
+                # cv2.rectangle(img, (LEFT_TOUCHING_MARGIN, PIANO_BARS_CENTER_POS[1] - TOUCHING_ZONE_FROM_PIANO_BAR_CENTER), (RIGHT_TOUCHING_MARGIN, PIANO_BARS_CENTER_POS[1]), TOUCHING_ZONE_COLOR, cv2.FILLED)
+                pass
+        # if within the bar width, calculate distance, draw line if within ready zone
 
-            # if within the bar width, calculate distance, draw line if within ready zone
+            # new: treat every finger point as starting, and set starting distance if we see an upward motion
+            # First we store the upward action
+            # Second, we also check whether the action is an upward motion, if not, we ignore this
+            # if yes, it qualify as a piano action. A ready state
+            vmDetect.store_upward_motion(finger, bar[2], finger_position_arr[1])
 
-            distance = math.hypot(finger_position_arr[0] - bar[0], finger_position_arr[1] - bar[1])
-            if bar[1] - finger_position_arr[1] < 0:
-                distance = -distance
+            if vmDetect.is_upward_vertical_motion(finger, bar[2]):
+                finger_starting_point = vmDetect.get_upward_motion_starting_point(finger, bar[2])
+                if finger_starting_point is not None:
+                    # detected a proper upward motion
+                    distance = math.hypot(finger_position_arr[0] - bar[0], finger_starting_point - bar[1])
+                    # print(f"upward: finger-{finger} {distance} {finger_starting_point}, {bar[1]}")
+                    # print(f"get upward motion: {vmDetect.get_upward_motions()}")
+                    # old distance: finger to bar approach
+                    # distance = math.hypot(finger_position_arr[0] - bar[0], finger_position_arr[1] - bar[1])
+                    # if bar[1] - finger_position_arr[1] < 0:
+                    # if bar[1] - finger_starting_point < 0:
+                    #     distance = -distance
 
-            # print(f"in key {bar[2]}, {distance}")
-            if distance <= READY_ZONE:
-                # print(f"READY_ZONE {bar[2]}, {distance}")
+                    # print(f"in key {bar[2]}, {distance}")
+                    # if distance <= READY_ZONE:
+                        # print(f"READY_ZONE {bar[2]}, {distance}")
 
-                if SHOW_FINGERTIP_DOTS_AND_LINES:
-                    # draw on finger
-                    cv2.circle(img, (finger_position_arr[0], finger_position_arr[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR,
-                               FINGER_DOT_SHAPE)
-                    # draw line
-                    cv2.line(img, (finger_position_arr[0], finger_position_arr[1]), (bar[0], bar[1]),
-                             LINE_FROM_FINGER_COLOR, LINE_FROM_FINGER_THICKNESS)
-                    # draw dots on bar also
-                    cv2.circle(img, (bar[0], bar[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
+                    if SHOW_FINGERTIP_DOTS_AND_LINES:
+                        # draw on finger
+                        cv2.circle(img, (finger_position_arr[0], finger_position_arr[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
+                        # draw line
+                        cv2.line(img, (finger_position_arr[0], finger_position_arr[1]), (bar[0], bar[1]), LINE_FROM_FINGER_COLOR, LINE_FROM_FINGER_THICKNESS)
+                        # draw dots on bar also
+                        cv2.circle(img, (bar[0], bar[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
 
-                # return the ready distance and also the bar label
-                return (distance, bar[2])
+                    # return the ready distance and also the bar label
+                    return (distance, bar[2])
 
     return (math.inf, "")
-
 
 def nothing(x):
     # a callback function for controls
@@ -281,14 +291,15 @@ def nothing(x):
 
 
 def main():
+
     """controlable variables"""
     global VM_SENSITIVITY
-    # global FRAME_PER_SECOND
     global SHOW_FINGERTIP_DOTS_AND_LINES
     global SHOW_TOP_MESSAGE
     global FINGERTIPS
     global NUMBER_OF_HANDS
     global PIANO_BARS
+    global BAR_LENGTH_ADJUSTMENT
 
     """ initialize variable"""
     cv2.namedWindow("Img")
@@ -297,26 +308,33 @@ def main():
     cap.set(4, hCam)
     pTime = 0
 
+    """other ML"""
+    gesture_recognizer = grm.gestureDetector()
+
     detector = htm.handDetector(min_detection_confidence=0.8)
     vmDetect = vmd.VerticalMotionDetector(sensitivity_level=VM_SENSITIVITY)
-    trottle_control = {i: [] for i in
-                       FINGERTIPS}  # a global variable to store conservative bars, for each finger. It use to prevent keep firing the same key when a finger stay in touching position
-    isBarEnabled = {j[2]: True for j in
-                    PIANO_BARS}  # a variable to store the whether a bar is enabled or disabled, prevent multiple fingers pressing the same bar and play sound
+    trottle_control = {i: [] for i in FINGERTIPS}  # a global variable to store conservative bars, for each finger. It use to prevent keep firing the same key when a finger stay in touching position
+    isBarEnabled = {j[2]: True for j in PIANO_BARS} # a variable to store the whether a bar is enabled or disabled, prevent multiple fingers pressing the same bar and play sound
 
-    pressed_bar_distance_info = dict()  # initialize, info for calling piano_bar function
+    pressed_bar_distance_info = dict() # initialize, info for calling piano_bar function
 
     # control buttons
     cv2.createTrackbar("V.Motion", "Img", 3, 10, nothing)
-    cv2.createTrackbar("P.Bars", "Img", 3, 14, nothing)
-    cv2.createTrackbar("Fingertips", "Img", 3, 10, nothing)
+    cv2.createTrackbar("P.Bars", "Img", 1, 14, nothing)
+    cv2.createTrackbar("Bars-Length", "Img", 1, 300, nothing)
+    cv2.createTrackbar("Fingertips", "Img", 1, 10, nothing)
     cv2.createTrackbar("Hands", "Img", 2, 2, nothing)
     cv2.createTrackbar("Dots-Lines", "Img", 1, 1, nothing)
     cv2.createTrackbar("Message", "Img", 1, 1, nothing)
 
+
     while True:
         if FRAME_PER_SECOND:
             time.sleep(FRAME_PER_SECOND)
+        success, img = cap.read() # initialize cv
+        img = cv2.flip(img, 1) # mirror the image so that it is normal facing
+        # result = gesture_recognizer.is_play(img)
+        img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES) # self create drawing hands class
         success, img = cap.read()  # initialize cv
         if not success:
             print("No image")
@@ -324,6 +342,9 @@ def main():
         img = cv2.flip(img, 1)  # mirror the image so that it is normal facing
         img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES)  # self create drawing hands class
         lmList = detector.findPosition(img, handNum=NUMBER_OF_HANDS, draw=False)
+
+        # result = gesture_recognizer.is_play(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        # print(f"GR: {result}")
 
         # draw finger pt and lines
         if len(lmList) != 0:
@@ -337,41 +358,49 @@ def main():
                 if SHOW_FINGERTIP_DOTS_AND_LINES:
                     cv2.circle(img, (x2, y2), FINGER_DOT_SIZE, (125, 125, 0), FINGER_DOT_SHAPE)
 
-                dist, bar_label = finger_to_keys_distance(img, [x2,
-                                                                y2])  # return the distance and draw the line if distance is short enough
+                dist, bar_label = finger_to_keys_distance(img, finger, [x2, y2], vmDetect) # return the distance and draw the line if distance is short enough
 
-                # print(finger, isBarEnabled, trottle_control)
+                # print(finger, isBarEnabled)
+
 
                 # As motion is in ready state, add to vertical motion detector for vertical motion detection later
-                vmDetect.store_motion(finger, bar_label, y2)
-
-                # Current finger Entering a bar
-                if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
-                    # consider touching
-                    # print(f"finger {finger} is touched a bar {bar_label} with distance: {dist}")
+                vmDetect.store_downward_motion(finger, bar_label, y2)
+                if bar_label != '' and dist < TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
+                    isBarEnabled[bar_label] = True
+                    print(f"here: {dist}, {bar_label}, {TOUCHING_ZONE_FROM_PIANO_BAR_CENTER}")
+                    # Current finger Entering a bar
+                    # if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
+                    # if dist <= TOUCHING_ZONE_FROM_PIANO_BAR_CENTER + BAR_LENGTH_ADJUSTMENT:
+                        # consider touching
+                    print(f"finger {finger} is touched a bar {bar_label} with distance: {dist}")
+                    print(finger, trottle_control)
+                    print(vmDetect.is_vertical_motion(finger, bar_label))
                     pressed_bar_distance_info[bar_label] = dist
 
 
                     # Tracking conservative bars. Not playing sound if the finger is keep staying
                     throttle_controller(trottle_control, finger, bar_label)
 
-                    # only play a sound if the bar is enabled AND is a veritcal motion
-                    if isBarEnabled[bar_label] and vmDetect.is_vertical_motion(finger, bar_label):
-                        # if isBarEnabled[bar_label]:
-                        #     print(f"firing sound {baddr_label}")
+                    # only play a sound if the bar is enabled AND is a vertical motion
+                    # if isBarEnabled[bar_label] and vmDetect.is_vertical_motion(finger, bar_label):
+                    if isBarEnabled[bar_label]:
+                    #     print(f"firing sound {bar_label}")
+                        #soundPool.submit(play_sound, bar_label)
                         play_sound(bar_label)
-                    isBarEnabled[bar_label] = False
+                        isBarEnabled[bar_label] = False
 
-                # Current finger Leaving a bar
-                else:
-                    # distance is more than TOUCHING_ZONE_FROM_PIANO_BAR_CENTER and current finger was previously touched
-                    trottle_control[finger] = []
-                    print(f'{finger} is leaving {bar_label}" is enabled')
-                    isBarEnabled[bar_label] = True
-                    pressed_bar_distance_info[bar_label] = None
+                    # Current finger Leaving a bar
+                    # else:
+                    #     # distance is more than TOUCHING_ZONE_FROM_PIANO_BAR_CENTER and current finger was previously touched
+                    #     trottle_control[finger] = []
+                    #     # print(f'{finger} is leaving {bar_label}" is enabled')
+                    #     isBarEnabled[bar_label] = True
+                    #     pressed_bar_distance_info[bar_label] = None
 
                 # cv2.putText(img, f'finger {finger} distance: {dist}', (40, FPS_Y_LOCATION + 60), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1) #tmp
                 # cv2.putText(img, f'finger {finger} pressed_bar_distance_info: {pressed_bar_distance_info}', (40, FPS_Y_LOCATION + 80), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1) #tmp
+
+
 
         # draw all the piano bars in one loop after knowing which bar(s) are down and also the bar y-axis postion
         bar_static = []
@@ -407,29 +436,29 @@ def main():
                     show_string += f"{item[0]}: {item[1]} "
                 if idx % 6 == 0:
                     if idx != 0:
-                        cv2.putText(img, show_string, (40, FPS_Y_LOCATION + y_increment), FPS_FONT, 0.4,
-                                    TOP_RIGHT_MSG_COLOR, 1)
+                        cv2.putText(img, show_string, (40, FPS_Y_LOCATION + y_increment), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1)
                     show_string = ""
                     y_increment += 20
 
-            show_string = "Vertical Motion count: "
-            for idx, item in enumerate(vmDetect.get_motions()):
+            show_string = "Vertical Upward Motion count: "
+            for idx, item in enumerate(vmDetect.get_upward_motions()):
                 show_string += item + ", "
-                if idx % 11 == 0:
-                    if idx != 0:
-                        cv2.putText(img, show_string, (40, FPS_Y_LOCATION + y_increment), FPS_FONT, 0.4,
-                                    TOP_RIGHT_MSG_COLOR, 1)
+                if idx % 11 ==0:
+                    if idx!= 0:
+                        cv2.putText(img, show_string, (40, FPS_Y_LOCATION + y_increment), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1)
                     show_string = ""
                     y_increment += 20
+
 
         # fps
         cTime = time.time()
-        fps = 1 / (cTime - pTime)
+        fps = 1/(cTime-pTime)
         pTime = cTime
 
         if SHOW_FPS:
             cv2.putText(img, f'FPS: {int(fps)}', (FPS_X_LOCATION, FPS_Y_LOCATION), FPS_FONT, FPS_FONT_SCALE,
-                        FPS_FONT_COLOR, FPS_FONT_THINKNESS)
+                    FPS_FONT_COLOR, FPS_FONT_THINKNESS)
+
 
         # show cv
         cv2.imshow("Img", img)
@@ -438,10 +467,13 @@ def main():
         # add controls
         VM_SENSITIVITY = cv2.getTrackbarPos("V.Motion", "Img")
         ft_value = cv2.getTrackbarPos("Fingertips", "Img")
+        bar_length_adj = cv2.getTrackbarPos("Bars-Length", "Img")
         NUMBER_OF_HANDS = cv2.getTrackbarPos("Hands", "Img")
         SHOW_FINGERTIP_DOTS_AND_LINES = cv2.getTrackbarPos("Dots-Lines", "Img")
         num_p_bars = cv2.getTrackbarPos("P.Bars", "Img")
         SHOW_TOP_MESSAGE = cv2.getTrackbarPos("Message", "Img")
+
+        BAR_LENGTH_ADJUSTMENT = BAR_SIZE_FROM_CENTER + bar_length_adj
 
         if num_p_bars == 1:
             PIANO_BARS = [PIANO_BAR_C_CENTER]
@@ -462,35 +494,27 @@ def main():
                           PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER]
         elif num_p_bars == 8:
             PIANO_BARS = [PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
-                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER,
-                          PIANO_BAR_F_CENTER]
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER]
         elif num_p_bars == 9:
             PIANO_BARS = [PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
-                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER,
-                          PIANO_BAR_F_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
                           PIANO_BAR_G_CENTER]
 
         elif num_p_bars == 10:
             PIANO_BARS = [PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
-                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER,
-                          PIANO_BAR_F_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
                           PIANO_BAR_G_CENTER]
         elif num_p_bars == 11:
             PIANO_BARS = [PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
-                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER,
-                          PIANO_BAR_F_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
                           PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER]
         elif num_p_bars == 12:
-            PIANO_BARS = [PIANO_BAR_LD_CENTER, PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER,
-                          PIANO_BAR_A_CENTER,
-                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER,
-                          PIANO_BAR_F_CENTER,
+            PIANO_BARS = [PIANO_BAR_LD_CENTER, PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
                           PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER]
         elif num_p_bars == 13:
-            PIANO_BARS = [PIANO_BAR_LD_CENTER, PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER,
-                          PIANO_BAR_A_CENTER,
-                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER,
-                          PIANO_BAR_F_CENTER,
+            PIANO_BARS = [PIANO_BAR_LD_CENTER, PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
+                          PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
                           PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER, PIANO_BAR_RB_CENTER]
         else:
             PIANO_BARS = [PIANO_BAR_LD_CENTER, PIANO_BAR_LE_CENTER, PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER,
@@ -499,10 +523,11 @@ def main():
                           PIANO_BAR_F_CENTER,
                           PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER, PIANO_BAR_RB_CENTER, PIANO_BAR_RC_CENTER]
 
+
         if ft_value == 1:
-            FINGERTIPS = [4]
+            FINGERTIPS = [8]
         elif ft_value == 2:
-            FINGERTIPS = [4, 8]
+            FINGERTIPS = [8, 12]
         elif ft_value == 3:
             FINGERTIPS = [4, 8, 12]
         elif ft_value == 4:
@@ -521,7 +546,6 @@ def main():
             FINGERTIPS = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40]
         else:
             FINGERTIPS = []
-
 
 cv2.destroyAllWindows()
 if __name__ == "__main__":
