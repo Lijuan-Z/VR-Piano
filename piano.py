@@ -55,7 +55,7 @@ TOUCHING_ZONE_COLOR = (0, 0, 255)
 TOUCHING_ZONE_WIDTH_DEDUCTION = 0 #10
 
 # Vertical motion
-VM_SENSITIVITY = 3
+VM_SENSITIVITY = 4
 VM_UPWARD_SENSITIVITY = 8
 
 # Piano bar position properites
@@ -243,33 +243,42 @@ def finger_to_keys_distance(img, finger, finger_position_arr, vmDetect):
             if GESTURE_RECOGNITION:
                 # print(f"ges: {GESTURE_RECOGNITION}")
                 vmDetect.store_upward_motion(finger, bar[2], finger_position_arr[1])
+                vmDetect.store_downward_motion(finger, bar[2], finger_position_arr[1])
 
                 if vmDetect.is_upward_vertical_motion(finger, bar[2]):
                     finger_starting_point = vmDetect.get_upward_motion_starting_point(finger, bar[2])
                     if finger_starting_point is not None:
                         # detected a proper upward motion
-                        distance = math.hypot(finger_position_arr[0] - bar[0], finger_starting_point - bar[1])
-                        # print(f"upward: finger-{finger} {distance} {finger_starting_point}, {bar[1]}")
-                        # print(f"get upward motion: {vmDetect.get_upward_motions()}")
-                        # old distance: finger to bar approach
-                        # distance = math.hypot(finger_position_arr[0] - bar[0], finger_position_arr[1] - bar[1])
-                        # if bar[1] - finger_position_arr[1] < 0:
-                        # if bar[1] - finger_starting_point < 0:
-                        #     distance = -distance
+                        distance = math.hypot(finger_position_arr[0] - bar[0], finger_starting_point - finger_position_arr[1])
 
-                        # print(f"in key {bar[2]}, {distance}")
-                        # if distance <= READY_ZONE:
-                            # print(f"READY_ZONE {bar[2]}, {distance}")
 
                         if SHOW_FINGERTIP_DOTS_AND_LINES:
                             # draw on finger
                             cv2.circle(img, (finger_position_arr[0], finger_position_arr[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
                             # draw line
-                            cv2.line(img, (finger_position_arr[0], finger_position_arr[1]), (bar[0], bar[1]), LINE_FROM_FINGER_COLOR, LINE_FROM_FINGER_THICKNESS)
+                            cv2.line(img, (finger_position_arr[0], finger_position_arr[1]), (bar[0], finger_starting_point), LINE_FROM_FINGER_COLOR, LINE_FROM_FINGER_THICKNESS)
                             # draw dots on bar also
                             cv2.circle(img, (bar[0], bar[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
 
                         # return the ready distance and also the bar label
+                        return (distance, bar[2])
+
+                elif vmDetect.is_vertical_motion(finger, bar[2]):
+                    key = f"{bar[2]}_{finger}"
+                    if key in vmDetect.enable_downward_motion_list:
+                        finger_down_starting_point = vmDetect.get_downward_motion_starting_point(finger, bar[2])
+                        distance = math.hypot(finger_position_arr[0] - bar[0], finger_position_arr[1] - finger_down_starting_point)
+
+                        if SHOW_FINGERTIP_DOTS_AND_LINES:
+                            # draw on finger
+                            cv2.circle(img, (finger_position_arr[0], finger_position_arr[1]), FINGER_DOT_SIZE,
+                                       FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
+                            # draw line
+                            cv2.line(img, (finger_position_arr[0], finger_position_arr[1]), (bar[0], finger_down_starting_point),
+                                     (0,128,255), LINE_FROM_FINGER_THICKNESS)
+                            # draw dots on bar also
+                            cv2.circle(img, (bar[0], bar[1]), FINGER_DOT_SIZE, FINGER_DOT_COLOR, FINGER_DOT_SHAPE)
+
                         return (distance, bar[2])
 
     return (math.inf, "")
@@ -324,9 +333,9 @@ def main():
             time.sleep(FRAME_PER_SECOND)
         success, img = cap.read() # initialize cv
         img = cv2.flip(img, 1) # mirror the image so that it is normal facing
-        OBJECT_DETECT = objd.run('./efficientdet_lite0.tflite', img)
-        cv2.putText(img, f'Object Detected: {OBJECT_DETECT}', (FPS_X_LOCATION + 300, FPS_Y_LOCATION + 20), FPS_FONT,
-                    0.4, (128, 255, 0), FPS_FONT_THINKNESS)
+        # OBJECT_DETECT = objd.run(img)
+        cv2.putText(img, f'Object Detected: {OBJECT_DETECT}', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
+                    0.5, (255, 255, 128), FPS_FONT_THINKNESS)
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES) # self create drawing hands class
         lmList = detector.findPosition(img, handNum=NUMBER_OF_HANDS, draw=False)
@@ -337,11 +346,11 @@ def main():
         if len(lmList) != 0:
             GESTURE_RECOGNITION = gesture.is_play(img_rgb)
             if GESTURE_RECOGNITION:
-                cv2.putText(img, f'GESTURE IS ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
+                cv2.putText(img, f'GESTURE IS ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION - 25), FPS_FONT,
                             0.5, (128,255,0), FPS_FONT_THINKNESS)
             else:
-                cv2.putText(img, f'GESTURE IS NOT ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
-                           0.4, (128, 0, 255), FPS_FONT_THINKNESS)
+                cv2.putText(img, f'GESTURE IS NOT ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION - 25), FPS_FONT,
+                           0.5, (128, 0, 255), FPS_FONT_THINKNESS)
 
             CURRENTFINGERTIPS = FINGERTIPS
             if len(lmList) <= 21:
@@ -359,37 +368,25 @@ def main():
 
 
                 # As motion is in ready state, add to vertical motion detector for vertical motion detection later
-                vmDetect.store_downward_motion(finger, bar_label, y2)
+                # vmDetect.store_downward_motion(finger, bar_label, y2)
                 if bar_label != '' and dist < TOUCHING_ZONE_FROM_PIANO_BAR_CENTER:
                     isBarEnabled[bar_label] = True
-                    print(f"here: {dist}, {bar_label}, {TOUCHING_ZONE_FROM_PIANO_BAR_CENTER}")
-
+                    # print(vmDetect.enable_downward_motion_list)
+                    # print(vmDetect.get_motions())
                     # consider touching
                     print(f"finger {finger} is touched a bar {bar_label} with distance: {dist}")
-                    # print(finger, trottle_control)
-                    # print(vmDetect.is_vertical_motion(finger, bar_label))
                     pressed_bar_distance_info[bar_label] = dist
                     # Tracking conservative bars. Not playing sound if the finger is keep staying
                     throttle_controller(trottle_control, finger, bar_label)
                     print(f"is upward motion? {vmDetect.is_upward_vertical_motion(finger, bar_label)} downward? {vmDetect.is_vertical_motion(finger, bar_label)}")
                     # only play a sound if the bar is enabled AND is a vertical motion
                     # if isBarEnabled[bar_label] and vmDetect.is_vertical_motion(finger, bar_label):
-                    if isBarEnabled[bar_label]:
-                    #     print(f"firing sound {bar_label}")
+                    key = f"{bar_label}_{finger}"
+                    if key in vmDetect.enable_downward_motion_list and vmDetect.is_vertical_motion(finger, bar_label):
+                        print(f"firing sound {bar_label}")
                         soundPool.submit(play_sound, bar_label)
+                        vmDetect.enable_downward_motion_list.remove(key)
                         isBarEnabled[bar_label] = False
-
-                    # Current finger Leaving a bar
-                    # else:
-                    #     # distance is more than TOUCHING_ZONE_FROM_PIANO_BAR_CENTER and current finger was previously touched
-                    #     trottle_control[finger] = []
-                    #     # print(f'{finger} is leaving {bar_label}" is enabled')
-                    #     isBarEnabled[bar_label] = True
-                    #     pressed_bar_distance_info[bar_label] = None
-
-                # cv2.putText(img, f'finger {finger} distance: {dist}', (40, FPS_Y_LOCATION + 60), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1) #tmp
-                # cv2.putText(img, f'finger {finger} pressed_bar_distance_info: {pressed_bar_distance_info}', (40, FPS_Y_LOCATION + 80), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1) #tmp
-
 
 
         # draw all the piano bars in one loop after knowing which bar(s) are down and also the bar y-axis postion
@@ -417,23 +414,24 @@ def main():
                     show_string += f"{k}:F "
                 cv2.putText(img, show_string, (40, FPS_Y_LOCATION + y_increment), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1)
 
-            show_string = "Piano Bar Y-Axis: "
-            y_increment = 40
-            for idx, item in enumerate(bar_static):
-                if item[1] is not None:
-                    show_string += f"{item[0]}: {item[1]:.1f} "
-                else:
-                    show_string += f"{item[0]}: {item[1]} "
-                if idx % 6 == 0:
-                    if idx != 0:
-                        cv2.putText(img, show_string, (40, FPS_Y_LOCATION + y_increment), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1)
-                    show_string = ""
-                    y_increment += 20
+            # show_string = "Piano Bar Y-Axis: "
+            # y_increment = 40
+            # for idx, item in enumerate(bar_static):
+            #     if item[1] is not None:
+            #         show_string += f"{item[0]}: {item[1]:.1f} "
+            #     else:
+            #         show_string += f"{item[0]}: {item[1]} "
+            #     if idx % 6 == 0:
+            #         if idx != 0:
+            #             cv2.putText(img, show_string, (40, FPS_Y_LOCATION + y_increment), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1)
+            #         show_string = ""
+            #         y_increment += 20
 
-            show_string = "Vertical Upward Motion count: "
-            for idx, item in enumerate(vmDetect.get_upward_motions()):
+            show_string = "Vertical Downward Motion count: "
+            y_increment = 40
+            for idx, item in enumerate(vmDetect.get_motions()):
                 show_string += item + ", "
-                if idx % 11 ==0:
+                if idx % 6 ==0:
                     if idx!= 0:
                         cv2.putText(img, show_string, (40, FPS_Y_LOCATION + y_increment), FPS_FONT, 0.4, TOP_RIGHT_MSG_COLOR, 1)
                     show_string = ""
@@ -463,6 +461,9 @@ def main():
         SHOW_FINGERTIP_DOTS_AND_LINES = cv2.getTrackbarPos("Dots-Lines", "Img")
         num_p_bars = cv2.getTrackbarPos("P.Bars", "Img")
         SHOW_TOP_MESSAGE = cv2.getTrackbarPos("Message", "Img")
+
+        vmDetect.set_sensitivity(VM_SENSITIVITY)
+        vmDetect.set_upward_sensitivity(VM_UPWARD_SENSITIVITY)
 
         BAR_LENGTH_ADJUSTMENT = BAR_SIZE_FROM_CENTER + bar_length_adj
 

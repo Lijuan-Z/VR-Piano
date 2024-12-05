@@ -48,8 +48,7 @@ def visualize(image, detection_result) -> np.ndarray:
     return image
 
 
-def run(image) -> None:
-# def run(model: str, camera_id: int, width: int, height: int, image) -> None:
+def run(model: str, camera_id: int, width: int, height: int) -> None:
     """Continuously run inference on images acquired from the camera.
 
     Args:
@@ -58,15 +57,15 @@ def run(image) -> None:
         width: The width of the frame captured from the camera.
         height: The height of the frame captured from the camera.
     """
-    rtn_item = ""
+
     # Variables to calculate FPS
     counter, fps = 0, 0
     start_time = time.time()
 
     # Start capturing video input from the camera
-    # cap = cv2.VideoCapture(camera_id)
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+    cap = cv2.VideoCapture(camera_id)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
     # Visualization parameters
     row_size = 20  # pixels
@@ -84,10 +83,9 @@ def run(image) -> None:
             category_name = detection.categories[0].category_name
             score = detection.categories[0].score
             bbox = detection.bounding_box
-            # if category_name == "dining table":
-            rtn_item = category_name
-            print(f'Detected: {category_name} ({score:.2f}), '
-                  f'Box: [{bbox.origin_x}, {bbox.origin_y}, {bbox.width}, {bbox.height}]')
+            if category_name == "dining table":
+                print(f'Detected: {category_name} ({score:.2f}), '
+                      f'Box: [{bbox.origin_x}, {bbox.origin_y}, {bbox.width}, {bbox.height}]')
         detection_result_list.append(result)
 
     # Initialize the object detection model
@@ -100,50 +98,61 @@ def run(image) -> None:
     detector = vision.ObjectDetector.create_from_options(options)
 
     # Continuously capture images from the camera and run inference
-    # while cap.isOpened():
-    #     success, image = cap.read()
-    #     if not success:
-    #         sys.exit(
-    #             'ERROR: Unable to read from webcam. Please verify your webcam settings.'
-    #         )
+    while cap.isOpened():
+        success, image = cap.read()
+        if not success:
+            sys.exit(
+                'ERROR: Unable to read from webcam. Please verify your webcam settings.'
+            )
 
-    counter += 1
-    # image = cv2.flip(image, 1)
+        counter += 1
+        image = cv2.flip(image, 1)
 
-    # Convert the image from BGR to RGB as required by the TFLite model.
-    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+        # Convert the image from BGR to RGB as required by the TFLite model.
+        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
 
-    # Run object detection using the model.
-    detector.detect_async(mp_image, counter)
-    current_frame = mp_image.numpy_view()
-    current_frame = cv2.cvtColor(current_frame, cv2.COLOR_RGB2BGR)
+        # Run object detection using the model.
+        detector.detect_async(mp_image, counter)
+        current_frame = mp_image.numpy_view()
+        current_frame = cv2.cvtColor(current_frame, cv2.COLOR_RGB2BGR)
 
-    if detection_result_list:
-        # Print detections
-        for detection in detection_result_list[0].detections:
-            category_name = detection.categories[0].category_name
-            score = detection.categories[0].score
-            bbox = detection.bounding_box
-            # if category_name == "dining table":
-            print(f'Detected 2: {category_name} ({score:.2f}), '
-              f'Box: [{bbox.origin_x}, {bbox.origin_y}, {bbox.width}, {bbox.height}]')
+        # Calculate the FPS
+        if counter % fps_avg_frame_count == 0:
+            end_time = time.time()
+            fps = fps_avg_frame_count / (end_time - start_time)
+            start_time = time.time()
 
-        # Visualize detections
-        # vis_image = visualize(current_frame, detection_result_list[0])
-        # cv2.imshow('object_detector', vis_image)
-        detection_result_list.clear()
-    else:
-        # cv2.imshow('object_detector', current_frame)
-        pass
+        # Show the FPS
+        fps_text = 'FPS = {:.1f}'.format(fps)
+        text_location = (left_margin, row_size)
+        cv2.putText(current_frame, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
+                    font_size, text_color, font_thickness)
 
-    # Stop the program if the ESC key is pressed.
-    # if cv2.waitKey(1) == 27:
-    #     break
+        if detection_result_list:
+            # Print detections
+            for detection in detection_result_list[0].detections:
+                category_name = detection.categories[0].category_name
+                score = detection.categories[0].score
+                bbox = detection.bounding_box
+                if category_name == "dining table":
+                    print(f'Detected: {category_name} ({score:.2f}), '
+                      f'Box: [{bbox.origin_x}, {bbox.origin_y}, {bbox.width}, {bbox.height}]')
+
+            # Visualize detections
+            vis_image = visualize(current_frame, detection_result_list[0])
+            cv2.imshow('object_detector', vis_image)
+            detection_result_list.clear()
+        else:
+            cv2.imshow('object_detector', current_frame)
+
+        # Stop the program if the ESC key is pressed.
+        if cv2.waitKey(1) == 27:
+            break
 
     detector.close()
-    # cap.release()
-    # cv2.destroyAllWindows()
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 def main():
@@ -173,5 +182,5 @@ def main():
     run(args.model, int(args.cameraId), args.frameWidth, args.frameHeight)
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()

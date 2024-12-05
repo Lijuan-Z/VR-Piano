@@ -12,6 +12,7 @@ class VerticalMotionDetector():
         self.upward_motion_store = dict()
         self.sensitivity_level = sensitivity_level
         self.upward_sensitivity_level = upward_sensitivity_level
+        self.enable_downward_motion_list = set()
 
     def get_motions(self):
         result = []
@@ -25,15 +26,29 @@ class VerticalMotionDetector():
             result.append(f"{k}:{len(v)}")
         return result
 
+    def get_downward_motion_list(self):
+        return self.enable_downward_motion_list
+
 
     def set_sensitivity(self, value):
         self.sensitivity_level = value
+
+    def set_upward_sensitivity(self, value):
+        self.upward_sensitivity_level = value
 
     def get_upward_motion_starting_point(self, finger, bar):
         if bar != "":
             key = f"{bar}_{finger}"
             if key in self.upward_motion_store:
                 return self.upward_motion_store[key][0]
+
+        return None
+
+    def get_downward_motion_starting_point(self, finger, bar):
+        if bar != "":
+            key = f"{bar}_{finger}"
+            if key in self.motion_store:
+                return self.motion_store[key][0]
 
         return None
 
@@ -52,6 +67,8 @@ class VerticalMotionDetector():
                 elif vertical_position < self.upward_motion_store[key][-1] or vertical_position < self.upward_motion_store[key][-2]:
                     "check if last action is bigger than the current one before append"
                     self.upward_motion_store[key].append(vertical_position)
+                    "check if qualify for downward motion after the upward motion"
+                    self.is_upward_vertical_motion(finger, bar)
                     return True
                 else:
                     "The motion is not the same as last two. Remove the whole record"
@@ -64,6 +81,7 @@ class VerticalMotionDetector():
         if finger != None:
             key = f"{bar}_{finger}"
             if key in self.upward_motion_store and len(self.upward_motion_store[key]) >= self.upward_sensitivity_level:
+                self.enable_downward_motion_list.add(key)
                 return True
             else:
                 return False
@@ -79,7 +97,7 @@ class VerticalMotionDetector():
 
     def store_downward_motion(self, finger, bar, vertical_position):
         if bar != "":
-            key = f" downward {bar}_{finger}"
+            key = f"{bar}_{finger}"
             if not key in self.motion_store:
                 "if the record is not exist, create one"
                 self.motion_store[key] = [vertical_position]
@@ -89,7 +107,8 @@ class VerticalMotionDetector():
                 if len(self.motion_store[key]) < 2:
                     self.motion_store[key].append(vertical_position)
                     return True
-                elif vertical_position > self.motion_store[key][-1] or vertical_position > self.motion_store[key][-2]:
+                elif vertical_position > self.motion_store[key][-1]:
+                # elif vertical_position > self.motion_store[key][-1] or vertical_position > self.motion_store[key][-2]:
                     "check if last action is bigger than the current one before append"
                     self.motion_store[key].append(vertical_position)
                     return True
@@ -105,6 +124,7 @@ class VerticalMotionDetector():
         if finger != None:
             key = f"{bar}_{finger}"
             if key in self.motion_store and len(self.motion_store[key]) >= self.sensitivity_level:
+                print(f"down: {key}, {len(self.motion_store[key])}, sen: {self.sensitivity_level}, m? {len(self.motion_store[key]) >= self.sensitivity_level}")
                 return True
             else:
                 return False
