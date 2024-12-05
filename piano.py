@@ -59,7 +59,7 @@ VM_SENSITIVITY = 4
 VM_UPWARD_SENSITIVITY = 8
 
 # Piano bar position properites
-PIANO_BAR_COLOR = (0, 255, 0)
+PIANO_BAR_COLOR = (255, 255, 255)
 PIANO_BARS_CENTER_POS = (325, 425)
 PIANO_BAR_LD_CENTER = (PIANO_BARS_CENTER_POS[0] - 12 * BAR_SIZE_FROM_CENTER, PIANO_BARS_CENTER_POS[1], 'LD')
 PIANO_BAR_LE_CENTER = (PIANO_BARS_CENTER_POS[0] - 10 * BAR_SIZE_FROM_CENTER, PIANO_BARS_CENTER_POS[1], 'LE')
@@ -177,7 +177,7 @@ def draw_single_piano_bar(img, bar, pos):
         pos = np.interp(pos, [BAR_DOWN_RANGE[0], BAR_DOWN_RANGE[1]], [y2, y1])
 
 
-        # cv2.line(img, (x1, int(pos)), (x2, int(pos)), PIANO_BAR_COLOR, 3)  # top, both p1, p2 y move
+        cv2.line(img, (x1, int(pos)), (x2, int(pos)), PIANO_BAR_COLOR, 3)  # top, both p1, p2 y move
         cv2.line(img, (x1, y1), (x1, int(pos)), PIANO_BAR_COLOR, 3)  # left,  y2 move
         cv2.line(img, (x2, y1), (x2, int(pos)), PIANO_BAR_COLOR, 3)  # right, y2 move
         cv2.line(img, (x1, y2), (x2, y2), PIANO_BAR_COLOR, 3)  # bottom, never move
@@ -318,10 +318,10 @@ def main():
     pressed_bar_distance_info = dict() # initialize, info for calling piano_bar function
 
     # control buttons
-    cv2.createTrackbar("UP.Motion", "Img", 5, 20, nothing)
-    cv2.createTrackbar("DWN.Motion", "Img", 3, 10, nothing)
+    cv2.createTrackbar("UP.Motion", "Img", 7, 20, nothing)
+    cv2.createTrackbar("DWN.Motion", "Img", 4, 10, nothing)
     cv2.createTrackbar("P.Bars", "Img", 5, 14, nothing)
-    cv2.createTrackbar("Bars-Length", "Img", 80, 300, nothing)
+    cv2.createTrackbar("Bars-Length", "Img", 180, 300, nothing)
     cv2.createTrackbar("Fingertips", "Img", 5, 10, nothing)
     cv2.createTrackbar("Hands", "Img", 2, 2, nothing)
     cv2.createTrackbar("Dots-Lines", "Img", 1, 1, nothing)
@@ -387,6 +387,7 @@ def main():
                         soundPool.submit(play_sound, bar_label)
                         vmDetect.enable_downward_motion_list.remove(key)
                         isBarEnabled[bar_label] = False
+                        vmDetect.enable_downward_motion_list = set()
 
 
         # draw all the piano bars in one loop after knowing which bar(s) are down and also the bar y-axis postion
@@ -472,18 +473,18 @@ def main():
         elif num_p_bars == 2:
             PIANO_BARS = [PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER]
         elif num_p_bars == 3:
-            PIANO_BARS = [PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER]
+            PIANO_BARS = [PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER]
         elif num_p_bars == 4:
-            PIANO_BARS = [PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER]
+            PIANO_BARS = [PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER]
         elif num_p_bars == 5:
-            PIANO_BARS = [PIANO_BAR_A_CENTER, PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER,
-                          PIANO_BAR_E_CENTER]
+            PIANO_BARS = [PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
+                          PIANO_BAR_G_CENTER]
         elif num_p_bars == 6:
-            PIANO_BARS = [PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER, PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER,
-                          PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER]
+            PIANO_BARS = [PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
+                          PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER]
         elif num_p_bars == 7:
-            PIANO_BARS = [PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER, PIANO_BAR_B_CENTER,
-                          PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER]
+            PIANO_BARS = [PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER,
+                          PIANO_BAR_G_CENTER, PIANO_BAR_RA_CENTER, PIANO_BAR_RB_CENTER]
         elif num_p_bars == 8:
             PIANO_BARS = [PIANO_BAR_LF_CENTER, PIANO_BAR_LG_CENTER, PIANO_BAR_A_CENTER,
                           PIANO_BAR_B_CENTER, PIANO_BAR_C_CENTER, PIANO_BAR_D_CENTER, PIANO_BAR_E_CENTER, PIANO_BAR_F_CENTER]
