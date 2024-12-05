@@ -1,11 +1,8 @@
-import argparse
 import sys
 import time
-
 import cv2
 import mediapipe as mp
 import numpy as np
-
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
@@ -48,7 +45,7 @@ def visualize(image, detection_result) -> np.ndarray:
     return image
 
 
-def run(model: str, camera_id: int, width: int, height: int) -> None:
+def run(model: str, camera_id: int, width: int, height: int) -> bool:
     """Continuously run inference on images acquired from the camera.
 
     Args:
@@ -56,8 +53,10 @@ def run(model: str, camera_id: int, width: int, height: int) -> None:
         camera_id: The camera id to be passed to OpenCV.
         width: The width of the frame captured from the camera.
         height: The height of the frame captured from the camera.
-    """
 
+    Returns:
+        True if bottle is detected, otherwise False.
+    """
     # Variables to calculate FPS
     counter, fps = 0, 0
     start_time = time.time()
@@ -67,24 +66,26 @@ def run(model: str, camera_id: int, width: int, height: int) -> None:
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
-    # Visualization parameters
-    row_size = 20  # pixels
-    left_margin = 24  # pixels
-    text_color = (0, 0, 255)  # red
-    font_size = 1
-    font_thickness = 1
-    fps_avg_frame_count = 10
-
     detection_result_list = []
+    bottle_detected = False  # Flag to track bottle detection
 
     def visualize_callback(result: vision.ObjectDetectorResult,
                            output_image: mp.Image, timestamp_ms: int):
+        """Callback to process detection results."""
+        nonlocal bottle_detected  # Access the outer function variable
+
         for detection in result.detections:
             category_name = detection.categories[0].category_name
             score = detection.categories[0].score
             bbox = detection.bounding_box
             print(f'Detected: {category_name} ({score:.2f}), '
                   f'Box: [{bbox.origin_x}, {bbox.origin_y}, {bbox.width}, {bbox.height}]')
+
+            if category_name.lower() == "bottle" and score > 0.5:
+                print("Bottle detected!")
+                bottle_detected = True  # Set the flag to True if bottle is detected
+                return  # Stop processing further detections
+
         detection_result_list.append(result)
 
     # Initialize the object detection model
@@ -115,33 +116,19 @@ def run(model: str, camera_id: int, width: int, height: int) -> None:
         current_frame = mp_image.numpy_view()
         current_frame = cv2.cvtColor(current_frame, cv2.COLOR_RGB2BGR)
 
-        # Calculate the FPS
-        if counter % fps_avg_frame_count == 0:
-            end_time = time.time()
-            fps = fps_avg_frame_count / (end_time - start_time)
-            start_time = time.time()
-
-        # Show the FPS
-        fps_text = 'FPS = {:.1f}'.format(fps)
-        text_location = (left_margin, row_size)
-        cv2.putText(current_frame, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
-                    font_size, text_color, font_thickness)
-
         if detection_result_list:
-            # Print detections
-            for detection in detection_result_list[0].detections:
-                category_name = detection.categories[0].category_name
-                score = detection.categories[0].score
-                bbox = detection.bounding_box
-                print(f'Detected: {category_name} ({score:.2f}), '
-                      f'Box: [{bbox.origin_x}, {bbox.origin_y}, {bbox.width}, {bbox.height}]')
-
-            # Visualize detections
             vis_image = visualize(current_frame, detection_result_list[0])
             cv2.imshow('object_detector', vis_image)
             detection_result_list.clear()
         else:
             cv2.imshow('object_detector', current_frame)
+
+        # If bottle is detected, return True and stop
+        if bottle_detected:
+            print("Bottle Detected, stopping.")
+            cap.release()
+            cv2.destroyAllWindows()
+            return True
 
         # Stop the program if the ESC key is pressed.
         if cv2.waitKey(1) == 27:
@@ -151,33 +138,4 @@ def run(model: str, camera_id: int, width: int, height: int) -> None:
     cap.release()
     cv2.destroyAllWindows()
 
-
-def main():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument(
-        '--model',
-        help='Path of the object detection model.',
-        required=False,
-        default='efficientdet_lite0.tflite')
-    parser.add_argument(
-        '--cameraId', help='Id of camera.', required=False, type=int, default=0)
-    parser.add_argument(
-        '--frameWidth',
-        help='Width of frame to capture from camera.',
-        required=False,
-        type=int,
-        default=1280)
-    parser.add_argument(
-        '--frameHeight',
-        help='Height of frame to capture from camera.',
-        required=False,
-        type=int,
-        default=720)
-    args = parser.parse_args()
-
-    run(args.model, int(args.cameraId), args.frameWidth, args.frameHeight)
-
-
-if __name__ == '__main__':
-    main()
+    return False  # Return False if no bottle is detected
