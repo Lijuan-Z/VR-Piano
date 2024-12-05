@@ -4,6 +4,7 @@ import numpy as np
 import math
 import HandTrackingModule as htm
 import VerticalMotionDetector as vmd
+import ObjectDetection as objd
 import concurrent.futures
 from playsound import playsound
 import GestureRecognizerModule as ges
@@ -11,6 +12,7 @@ soundPool = concurrent.futures.ThreadPoolExecutor(max_workers=20)
 
 # ML control
 GESTURE_RECOGNITION = True
+OBJECT_DETECT = ""
 
 # screen control
 FRAME_PER_SECOND = None  # 0.1 means 10 frame per second, 0.5 means 2 frame per second. Put "None" if you want the fastest output
@@ -287,8 +289,10 @@ def main():
     global FINGERTIPS
     global NUMBER_OF_HANDS
     global PIANO_BARS
-    gesture = ges.gestureDetector()
     global BAR_LENGTH_ADJUSTMENT
+    gesture = ges.gestureDetector()
+
+
 
     """ initialize variable"""
     cv2.namedWindow("Img")
@@ -320,6 +324,9 @@ def main():
             time.sleep(FRAME_PER_SECOND)
         success, img = cap.read() # initialize cv
         img = cv2.flip(img, 1) # mirror the image so that it is normal facing
+        OBJECT_DETECT = objd.run('./efficientdet_lite0.tflite', img)
+        cv2.putText(img, f'Object Detected: {OBJECT_DETECT}', (FPS_X_LOCATION + 300, FPS_Y_LOCATION + 20), FPS_FONT,
+                    0.4, (128, 255, 0), FPS_FONT_THINKNESS)
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = detector.findHands(img, draw=SHOW_FINGERTIP_DOTS_AND_LINES) # self create drawing hands class
         lmList = detector.findPosition(img, handNum=NUMBER_OF_HANDS, draw=False)
@@ -331,7 +338,7 @@ def main():
             GESTURE_RECOGNITION = gesture.is_play(img_rgb)
             if GESTURE_RECOGNITION:
                 cv2.putText(img, f'GESTURE IS ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
-                            0.4, (128,255,0), FPS_FONT_THINKNESS)
+                            0.5, (128,255,0), FPS_FONT_THINKNESS)
             else:
                 cv2.putText(img, f'GESTURE IS NOT ALLOWED', (FPS_X_LOCATION + 300, FPS_Y_LOCATION), FPS_FONT,
                            0.4, (128, 0, 255), FPS_FONT_THINKNESS)
