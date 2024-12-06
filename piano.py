@@ -177,7 +177,8 @@ def draw_single_piano_bar(img, bar, pos):
         pos = np.interp(pos, [BAR_DOWN_RANGE[0], BAR_DOWN_RANGE[1]], [y2, y1])
 
 
-        cv2.line(img, (x1, int(pos)), (x2, int(pos)), PIANO_BAR_COLOR, 3)  # top, both p1, p2 y move
+        # cv2.line(img, (x1, int(pos)), (x2, int(pos)), PIANO_BAR_COLOR, 3)  # top, both p1, p2 y move
+        cv2.line(img, (x1, y1), (x2, y1), PIANO_BAR_COLOR, 3)
         cv2.line(img, (x1, y1), (x1, int(pos)), PIANO_BAR_COLOR, 3)  # left,  y2 move
         cv2.line(img, (x2, y1), (x2, int(pos)), PIANO_BAR_COLOR, 3)  # right, y2 move
         cv2.line(img, (x1, y2), (x2, y2), PIANO_BAR_COLOR, 3)  # bottom, never move
@@ -318,14 +319,14 @@ def main():
     pressed_bar_distance_info = dict() # initialize, info for calling piano_bar function
 
     # control buttons
-    cv2.createTrackbar("UP.Motion", "Img", 7, 20, nothing)
-    cv2.createTrackbar("DWN.Motion", "Img", 4, 10, nothing)
-    cv2.createTrackbar("P.Bars", "Img", 5, 14, nothing)
-    cv2.createTrackbar("Bars-Length", "Img", 180, 300, nothing)
-    cv2.createTrackbar("Fingertips", "Img", 5, 10, nothing)
-    cv2.createTrackbar("Hands", "Img", 2, 2, nothing)
+    cv2.createTrackbar("UP.Motion", "Img", 5, 20, nothing)
+    cv2.createTrackbar("DWN.Motion", "Img", 3, 10, nothing)
+    cv2.createTrackbar("P.Bars", "Img", 3, 14, nothing)
+    cv2.createTrackbar("Bars-Length", "Img", 150, 300, nothing)
+    cv2.createTrackbar("Fingertips", "Img", 10, 10, nothing)
+    cv2.createTrackbar("Hands", "Img", 1, 2, nothing)
     cv2.createTrackbar("Dots-Lines", "Img", 1, 1, nothing)
-    cv2.createTrackbar("Message", "Img", 1, 1, nothing)
+    cv2.createTrackbar("Message", "Img", 0, 1, nothing)
 
 
     while True:
@@ -382,7 +383,7 @@ def main():
                     # only play a sound if the bar is enabled AND is a vertical motion
                     # if isBarEnabled[bar_label] and vmDetect.is_vertical_motion(finger, bar_label):
                     key = f"{bar_label}_{finger}"
-                    if key in vmDetect.enable_downward_motion_list and vmDetect.is_vertical_motion(finger, bar_label):
+                    if key in vmDetect.enable_downward_motion_list and vmDetect.is_vertical_motion(finger, bar_label) and GESTURE_RECOGNITION:
                         print(f"firing sound {bar_label}")
                         soundPool.submit(play_sound, bar_label)
                         vmDetect.enable_downward_motion_list.remove(key)
